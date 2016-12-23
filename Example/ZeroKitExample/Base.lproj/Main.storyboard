@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Sign in-->
+        <scene sceneID="wmZ-rR-ZXk">
+            <objects>
+                <viewController storyboardIdentifier="SignInViewController" title="Sign in" id="iP1-BF-78T" customClass="SignInViewController" customModule="ZeroKitExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="n0w-bF-4yO"/>
+                        <viewControllerLayoutGuide type="bottom" id="8b3-9j-U7D"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Vyn-Uq-Dly">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="cj7-w3-P7s">
+                                <rect key="frame" x="15" y="30" width="345" height="140.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign in" textAlignment="center" lineBreakMode="characterWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JJb-yw-Nlc">
+                                        <rect key="frame" x="147" y="0.0" width="51.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PYv-jJ-IP3">
+                                        <rect key="frame" x="0.0" y="30.5" width="345" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gSD-qS-3JB" customClass="ZeroKitPasswordField" customModule="ZeroKit">
+                                        <rect key="frame" x="0.0" y="70.5" width="345" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Password"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DO4-HY-M0c">
+                                        <rect key="frame" x="116" y="110.5" width="113" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="113" id="Mnh-Jr-FXb"/>
+                                        </constraints>
+                                        <state key="normal" title="Sign in"/>
+                                        <connections>
+                                            <action selector="signInButtonTap:" destination="iP1-BF-78T" eventType="touchUpInside" id="X3Q-Gp-aJg"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="gSD-qS-3JB" firstAttribute="leading" secondItem="cj7-w3-P7s" secondAttribute="leading" id="35S-AH-5L6"/>
+                                    <constraint firstAttribute="trailing" secondItem="gSD-qS-3JB" secondAttribute="trailing" id="VFN-aG-Chk"/>
+                                    <constraint firstAttribute="trailing" secondItem="PYv-jJ-IP3" secondAttribute="trailing" id="iUu-rg-n3P"/>
+                                    <constraint firstItem="PYv-jJ-IP3" firstAttribute="leading" secondItem="cj7-w3-P7s" secondAttribute="leading" id="l4Z-xl-ESg"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="cj7-w3-P7s" secondAttribute="trailing" constant="15" id="N72-0B-Qu6"/>
+                            <constraint firstItem="cj7-w3-P7s" firstAttribute="top" secondItem="n0w-bF-4yO" secondAttribute="bottom" constant="10" id="RLq-46-S3J"/>
+                            <constraint firstItem="cj7-w3-P7s" firstAttribute="leading" secondItem="Vyn-Uq-Dly" secondAttribute="leading" constant="15" id="XaO-m4-1Lb"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Sign in" image="tabbar-icon" id="mmg-tT-c3f"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="passwordTextField" destination="gSD-qS-3JB" id="lrB-Wd-5FV"/>
+                        <outlet property="signInButton" destination="DO4-HY-M0c" id="WsD-nj-Yp6"/>
+                        <outlet property="usernameTextField" destination="PYv-jJ-IP3" id="mS8-m7-Oq4"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bbp-8U-nMV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-114.40000000000001" y="1127.5862068965519"/>
+        </scene>
+        <!--Encrypt-->
+        <scene sceneID="F6E-Tf-g69">
+            <objects>
+                <viewController storyboardIdentifier="EncryptViewController" title="Encrypt" id="1Wu-Mz-FY0" customClass="EncryptViewController" customModule="ZeroKitExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="x5B-4W-o7N"/>
+                        <viewControllerLayoutGuide type="bottom" id="2ek-4s-1Fo"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="nAB-Sk-xx2">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="interactive" translatesAutoresizingMaskIntoConstraints="NO" id="M62-2P-cTR">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="cON-AW-VZs">
+                                        <rect key="frame" x="15" y="30" width="345" height="9331"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Let's encrypt!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XMf-pp-iss">
+                                                <rect key="frame" x="0.0" y="0.0" width="345" height="27"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uzN-qB-fkG" customClass="StepContainerView" customModule="ZeroKitExample" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="47" width="345" height="6224"/>
+                                                <subviews>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="FXk-IO-1Dp">
+                                                        <rect key="frame" x="10" y="10" width="325" height="6204"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Step 1: Create a Tresor" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qkK-jN-gLg">
+                                                                <rect key="frame" x="76" y="0.0" width="174" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="A tresor is a lock box for keys that you can share with other users." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g3S-62-Tgt">
+                                                                <rect key="frame" x="163" y="29" width="0.0" height="6137"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="aLH-rn-WIo">
+                                                                <rect key="frame" x="60" y="6174" width="205" height="30"/>
+                                                                <subviews>
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2cC-CB-nyz">
+                                                                        <rect key="frame" x="0.0" y="0.0" width="94" height="30"/>
+                                                                        <state key="normal" title="Create Tresor"/>
+                                                                        <connections>
+                                                                            <action selector="createTresorButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="cG4-ZX-Xj1"/>
+                                                                        </connections>
+                                                                    </button>
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hmk-tp-Kty">
+                                                                        <rect key="frame" x="114" y="0.0" width="91" height="30"/>
+                                                                        <state key="normal" title="Select Tresor"/>
+                                                                        <connections>
+                                                                            <action selector="selectTresorButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="Hkh-Oe-lbW"/>
+                                                                        </connections>
+                                                                    </button>
+                                                                </subviews>
+                                                            </stackView>
+                                                        </subviews>
+                                                    </stackView>
+                                                </subviews>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="FXk-IO-1Dp" secondAttribute="trailing" constant="10" id="GfV-hd-hP4"/>
+                                                    <constraint firstItem="FXk-IO-1Dp" firstAttribute="top" secondItem="uzN-qB-fkG" secondAttribute="top" constant="10" id="Grb-hE-Owq"/>
+                                                    <constraint firstItem="FXk-IO-1Dp" firstAttribute="leading" secondItem="uzN-qB-fkG" secondAttribute="leading" constant="10" id="ipf-ud-5PZ"/>
+                                                    <constraint firstAttribute="bottom" secondItem="FXk-IO-1Dp" secondAttribute="bottom" constant="10" id="k9h-Cm-WhR"/>
+                                                </constraints>
+                                            </view>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="D2u-GK-iXO" customClass="StepContainerView" customModule="ZeroKitExample" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="6291" width="345" height="1000"/>
+                                                <subviews>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="69e-SD-shD">
+                                                        <rect key="frame" x="10" y="10" width="325" height="980"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Step 2: Enter text to encrypt" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ier-3A-EC3">
+                                                                <rect key="frame" x="0.0" y="0.0" width="325" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Hello world!" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="bOn-XZ-6T2">
+                                                                <rect key="frame" x="0.0" y="29" width="325" height="80"/>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="height" constant="80" id="bhc-yq-Ynv"/>
+                                                                </constraints>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                            </textView>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tresor ID: 123123" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xd7-KF-zPf">
+                                                                <rect key="frame" x="0.0" y="117" width="325" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qFC-SH-Dev">
+                                                                <rect key="frame" x="0.0" y="146" width="325" height="834"/>
+                                                                <state key="normal" title="Encrypt"/>
+                                                                <connections>
+                                                                    <action selector="encryptButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="zK9-dk-gg3"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                    </stackView>
+                                                </subviews>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="69e-SD-shD" secondAttribute="trailing" constant="10" id="EgV-u2-BYp"/>
+                                                    <constraint firstAttribute="bottom" secondItem="69e-SD-shD" secondAttribute="bottom" constant="10" id="IIZ-aj-YFt"/>
+                                                    <constraint firstItem="69e-SD-shD" firstAttribute="leading" secondItem="D2u-GK-iXO" secondAttribute="leading" constant="10" id="Nkw-CA-jV2"/>
+                                                    <constraint firstItem="69e-SD-shD" firstAttribute="top" secondItem="D2u-GK-iXO" secondAttribute="top" constant="10" id="Rut-5T-gl5"/>
+                                                </constraints>
+                                            </view>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="762-yI-a1F" customClass="StepContainerView" customModule="ZeroKitExample" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="7311" width="345" height="1000"/>
+                                                <subviews>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="jsJ-oP-87G">
+                                                        <rect key="frame" x="10" y="10" width="325" height="980"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Test decryption" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OMd-Zz-zkB">
+                                                                <rect key="frame" x="103" y="0.0" width="120" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="qs2-rc-57q">
+                                                                <rect key="frame" x="0.0" y="29" width="325" height="80"/>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="height" constant="80" id="rHC-Bf-NYM"/>
+                                                                </constraints>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                            </textView>
+                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="iJL-mZ-27E">
+                                                                <rect key="frame" x="91" y="117" width="144" height="834"/>
+                                                                <subviews>
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8jz-fv-Lms">
+                                                                        <rect key="frame" x="0.0" y="0.0" width="55" height="834"/>
+                                                                        <state key="normal" title="Decrypt"/>
+                                                                        <connections>
+                                                                            <action selector="decryptButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="tCg-KN-GLl"/>
+                                                                        </connections>
+                                                                    </button>
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Don-xj-2Ix">
+                                                                        <rect key="frame" x="75" y="0.0" width="69" height="834"/>
+                                                                        <state key="normal" title="Copy Text"/>
+                                                                        <connections>
+                                                                            <action selector="copyTextButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="qom-j3-Sql"/>
+                                                                        </connections>
+                                                                    </button>
+                                                                </subviews>
+                                                            </stackView>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="decrypted content" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yFw-RQ-ldd">
+                                                                <rect key="frame" x="92" y="959" width="142" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstItem="qs2-rc-57q" firstAttribute="leading" secondItem="jsJ-oP-87G" secondAttribute="leading" id="LQ4-vE-IBj"/>
+                                                            <constraint firstAttribute="trailing" secondItem="qs2-rc-57q" secondAttribute="trailing" id="ZOo-BK-b5E"/>
+                                                        </constraints>
+                                                    </stackView>
+                                                </subviews>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="jsJ-oP-87G" secondAttribute="trailing" constant="10" id="BF6-ZO-136"/>
+                                                    <constraint firstAttribute="bottom" secondItem="jsJ-oP-87G" secondAttribute="bottom" constant="10" id="F2k-aG-if5"/>
+                                                    <constraint firstItem="jsJ-oP-87G" firstAttribute="leading" secondItem="762-yI-a1F" secondAttribute="leading" constant="10" id="NAb-OV-BCW"/>
+                                                    <constraint firstItem="jsJ-oP-87G" firstAttribute="top" secondItem="762-yI-a1F" secondAttribute="top" constant="10" id="qHT-L0-ekc"/>
+                                                </constraints>
+                                            </view>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7AW-X7-Saa" customClass="StepContainerView" customModule="ZeroKitExample" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="8331" width="345" height="1000"/>
+                                                <subviews>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="m2D-9u-jYT">
+                                                        <rect key="frame" x="10" y="10" width="325" height="980"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Step 3: Share the tresor" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="16E-9H-cJP">
+                                                                <rect key="frame" x="0.0" y="0.0" width="325" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="username to share with" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4D8-Bq-CKo">
+                                                                <rect key="frame" x="0.0" y="29" width="325" height="24"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="height" constant="24" id="Hn5-1l-mp4"/>
+                                                                </constraints>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <textInputTraits key="textInputTraits"/>
+                                                            </textField>
+                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PDv-1X-82Z">
+                                                                <rect key="frame" x="0.0" y="61" width="325" height="890"/>
+                                                                <state key="normal" title="Share"/>
+                                                                <connections>
+                                                                    <action selector="shareButtonTap:" destination="1Wu-Mz-FY0" eventType="touchUpInside" id="39x-mM-XwT"/>
+                                                                </connections>
+                                                            </button>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="share result" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="alS-gA-WPa">
+                                                                <rect key="frame" x="0.0" y="959" width="325" height="21"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                        </subviews>
+                                                    </stackView>
+                                                </subviews>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="m2D-9u-jYT" secondAttribute="trailing" constant="10" id="EQg-YZ-G3P"/>
+                                                    <constraint firstAttribute="bottom" secondItem="m2D-9u-jYT" secondAttribute="bottom" constant="10" id="UVF-Pk-sGr"/>
+                                                    <constraint firstItem="m2D-9u-jYT" firstAttribute="top" secondItem="7AW-X7-Saa" secondAttribute="top" constant="10" id="rwf-nB-Q5f"/>
+                                                    <constraint firstItem="m2D-9u-jYT" firstAttribute="leading" secondItem="7AW-X7-Saa" secondAttribute="leading" constant="10" id="vaV-z0-aEd"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="cON-AW-VZs" firstAttribute="width" secondItem="M62-2P-cTR" secondAttribute="width" constant="-30" id="GtP-1R-B78"/>
+                                    <constraint firstItem="cON-AW-VZs" firstAttribute="top" secondItem="M62-2P-cTR" secondAttribute="top" constant="30" id="HMV-cs-T2C"/>
+                                    <constraint firstAttribute="bottom" secondItem="cON-AW-VZs" secondAttribute="bottom" constant="20" id="V87-XO-Vle"/>
+                                    <constraint firstItem="cON-AW-VZs" firstAttribute="leading" secondItem="M62-2P-cTR" secondAttribute="leading" constant="15" id="ac7-UH-qoI"/>
+                                    <constraint firstAttribute="trailing" secondItem="cON-AW-VZs" secondAttribute="trailing" constant="15" id="juL-Kg-IOk"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="M62-2P-cTR" firstAttribute="top" secondItem="nAB-Sk-xx2" secondAttribute="top" id="6bs-Vg-ZQS"/>
+                            <constraint firstAttribute="trailing" secondItem="M62-2P-cTR" secondAttribute="trailing" id="D8y-vX-SWB"/>
+                            <constraint firstItem="M62-2P-cTR" firstAttribute="leading" secondItem="nAB-Sk-xx2" secondAttribute="leading" id="idB-Th-k3j"/>
+                            <constraint firstItem="2ek-4s-1Fo" firstAttribute="top" secondItem="M62-2P-cTR" secondAttribute="bottom" id="jel-DS-SgO"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Encrypt" image="tabbar-icon" id="oLI-WE-t2x"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="cipherTextView" destination="qs2-rc-57q" id="M4Z-hF-TZw"/>
+                        <outlet property="createTresorStepView" destination="uzN-qB-fkG" id="vYC-qT-Hr7"/>
+                        <outlet property="encryptTextStepView" destination="D2u-GK-iXO" id="znO-pg-kTj"/>
+                        <outlet property="plainTextLabel" destination="yFw-RQ-ldd" id="kQp-dv-6Sh"/>
+                        <outlet property="plainTextView" destination="bOn-XZ-6T2" id="aID-mw-8cS"/>
+                        <outlet property="scrollView" destination="M62-2P-cTR" id="jD9-3s-f2a"/>
+                        <outlet property="shareResultLabel" destination="alS-gA-WPa" id="I5h-22-3zb"/>
+                        <outlet property="shareTresorStepView" destination="7AW-X7-Saa" id="HJw-Jm-xek"/>
+                        <outlet property="testDecryptStepView" destination="762-yI-a1F" id="IUi-pM-uUd"/>
+                        <outlet property="tresorIdLabel" destination="Xd7-KF-zPf" id="eNm-Db-ilg"/>
+                        <outlet property="usernameTextField" destination="4D8-Bq-CKo" id="e2t-g0-gPr"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="N1P-at-22x" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-114" y="1799"/>
+        </scene>
+        <!--Account-->
+        <scene sceneID="Dsz-17-G3A">
+            <objects>
+                <viewController storyboardIdentifier="AccountViewController" id="Jpg-9j-21h" customClass="AccountViewController" customModule="ZeroKitExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="EaA-dL-g7X"/>
+                        <viewControllerLayoutGuide type="bottom" id="B6s-s7-9tz"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="O4z-WU-TD8">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="sZa-4r-2Fn">
+                                <rect key="frame" x="20" y="30" width="335" height="84"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Signed in as" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dJz-iK-cXt">
+                                        <rect key="frame" x="121" y="0.0" width="93" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="username (user ID)" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gM6-JI-tkz">
+                                        <rect key="frame" x="106" y="29" width="123" height="17"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fws-Hy-uzE">
+                                        <rect key="frame" x="139" y="54" width="57" height="30"/>
+                                        <state key="normal" title="Sign out"/>
+                                        <connections>
+                                            <action selector="signOutButtonTap:" destination="Jpg-9j-21h" eventType="touchUpInside" id="kuB-ez-bC6"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="sZa-4r-2Fn" firstAttribute="leading" secondItem="O4z-WU-TD8" secondAttribute="leading" constant="20" id="ZAc-98-Qkz"/>
+                            <constraint firstItem="sZa-4r-2Fn" firstAttribute="top" secondItem="EaA-dL-g7X" secondAttribute="bottom" constant="10" id="doQ-7F-XCu"/>
+                            <constraint firstAttribute="trailing" secondItem="sZa-4r-2Fn" secondAttribute="trailing" constant="20" id="jPd-mQ-q3O"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Account" image="tabbar-icon" id="gIw-pk-7qb"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="usernameLabel" destination="gM6-JI-tkz" id="3lx-Qw-uLi"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Z8l-Jg-LPj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1162" y="1799"/>
+        </scene>
+        <!--Decrypt-->
+        <scene sceneID="Q3G-CA-WnL">
+            <objects>
+                <viewController storyboardIdentifier="DecryptViewController" title="Decrypt" id="GfO-Wc-pGV" customClass="DecryptViewController" customModule="ZeroKitExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="i6O-0C-ceP"/>
+                        <viewControllerLayoutGuide type="bottom" id="HqZ-u9-Sap"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="C3s-u7-LQh">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Gdi-Y9-TIV">
+                                <rect key="frame" x="15" y="30" width="345" height="188"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Decrypt" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lle-RU-K34">
+                                        <rect key="frame" x="134" y="0.0" width="78" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="WaJ-NJ-T5u">
+                                        <rect key="frame" x="0.0" y="37" width="345" height="80"/>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="80" id="MRD-3H-Gde"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="vo0-le-LQb">
+                                        <rect key="frame" x="63" y="127" width="220" height="30"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RhG-jc-b7y">
+                                                <rect key="frame" x="0.0" y="0.0" width="55" height="30"/>
+                                                <state key="normal" title="Decrypt"/>
+                                                <connections>
+                                                    <action selector="decryptButtonTap:" destination="GfO-Wc-pGV" eventType="touchUpInside" id="eay-Ed-Q22"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UfP-Qb-i2D">
+                                                <rect key="frame" x="75" y="0.0" width="145" height="30"/>
+                                                <state key="normal" title="Paste from Clipboard"/>
+                                                <connections>
+                                                    <action selector="pasteButtonTap:" destination="GfO-Wc-pGV" eventType="touchUpInside" id="Clq-v8-4VI"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="decrypted content" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bNW-ns-QMV">
+                                        <rect key="frame" x="102" y="167" width="142" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="WaJ-NJ-T5u" secondAttribute="trailing" id="L13-zu-Nzx"/>
+                                    <constraint firstItem="WaJ-NJ-T5u" firstAttribute="leading" secondItem="Gdi-Y9-TIV" secondAttribute="leading" id="YS8-r2-fBw"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Gdi-Y9-TIV" firstAttribute="leading" secondItem="C3s-u7-LQh" secondAttribute="leading" constant="15" id="7R8-Qf-RlN"/>
+                            <constraint firstItem="Gdi-Y9-TIV" firstAttribute="top" secondItem="i6O-0C-ceP" secondAttribute="bottom" constant="10" id="HrM-Ro-fnZ"/>
+                            <constraint firstAttribute="trailing" secondItem="Gdi-Y9-TIV" secondAttribute="trailing" constant="15" id="lnZ-7R-Ldb"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Decrypt" image="tabbar-icon" id="47h-gR-EOK"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="cipherTextView" destination="WaJ-NJ-T5u" id="yyy-DO-mq9"/>
+                        <outlet property="plainTextLabel" destination="bNW-ns-QMV" id="Ifz-MG-80v"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Hrg-OW-TIh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="521" y="1799"/>
+        </scene>
+        <!--Sign up-->
+        <scene sceneID="47c-w4-ddI">
+            <objects>
+                <viewController storyboardIdentifier="SignUpViewController" title="Sign up" id="wjX-eV-oIo" customClass="SignUpViewController" customModule="ZeroKitExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Tfc-le-bgY"/>
+                        <viewControllerLayoutGuide type="bottom" id="fyR-zm-scN"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="0wy-qT-6wG">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="6fk-hP-EDt">
+                                <rect key="frame" x="15" y="30" width="345" height="180.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign up" textAlignment="center" lineBreakMode="characterWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OAY-68-P7G">
+                                        <rect key="frame" x="143.5" y="0.0" width="58" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="s8V-Mj-DOC">
+                                        <rect key="frame" x="0.0" y="30.5" width="345" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4fD-xr-uGJ" customClass="ZeroKitPasswordField" customModule="ZeroKit">
+                                        <rect key="frame" x="0.0" y="70.5" width="345" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Password"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pe0-rg-Dz0" customClass="ZeroKitPasswordField" customModule="ZeroKit">
+                                        <rect key="frame" x="0.0" y="110.5" width="345" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Confirm password"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o6A-G3-GkP">
+                                        <rect key="frame" x="116" y="150.5" width="113" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="113" id="9m1-By-Isp"/>
+                                        </constraints>
+                                        <state key="normal" title="Sign up"/>
+                                        <connections>
+                                            <action selector="signUpButtonTap:" destination="wjX-eV-oIo" eventType="touchUpInside" id="zGD-Xq-mI9"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="pe0-rg-Dz0" secondAttribute="trailing" id="IVA-IX-abM"/>
+                                    <constraint firstItem="pe0-rg-Dz0" firstAttribute="leading" secondItem="6fk-hP-EDt" secondAttribute="leading" id="WeL-gt-ktE"/>
+                                    <constraint firstAttribute="trailing" secondItem="s8V-Mj-DOC" secondAttribute="trailing" id="e1T-g5-Lwc"/>
+                                    <constraint firstAttribute="trailing" secondItem="4fD-xr-uGJ" secondAttribute="trailing" id="sqP-NE-1ic"/>
+                                    <constraint firstItem="4fD-xr-uGJ" firstAttribute="leading" secondItem="6fk-hP-EDt" secondAttribute="leading" id="t6V-eg-VNL"/>
+                                    <constraint firstItem="s8V-Mj-DOC" firstAttribute="leading" secondItem="6fk-hP-EDt" secondAttribute="leading" id="uzk-wb-omh"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="6fk-hP-EDt" firstAttribute="leading" secondItem="0wy-qT-6wG" secondAttribute="leading" constant="15" id="4aa-F8-a4V"/>
+                            <constraint firstItem="6fk-hP-EDt" firstAttribute="top" secondItem="Tfc-le-bgY" secondAttribute="bottom" constant="10" id="QFh-76-R8Y"/>
+                            <constraint firstAttribute="trailing" secondItem="6fk-hP-EDt" secondAttribute="trailing" constant="15" id="Zma-G0-B0q"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Sign up" image="tabbar-icon" id="SRL-8S-NoQ"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="passwordConfirmationTextField" destination="pe0-rg-Dz0" id="xug-zx-cGV"/>
+                        <outlet property="passwordTextField" destination="4fD-xr-uGJ" id="eQr-N5-anK"/>
+                        <outlet property="signUpButton" destination="o6A-G3-GkP" id="OcT-tC-a0A"/>
+                        <outlet property="usernameTextField" destination="s8V-Mj-DOC" id="0nW-Eu-PJl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="C6g-fm-PTV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="521" y="1128"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="tabbar-icon" width="21" height="25"/>
+    </resources>
+</document>

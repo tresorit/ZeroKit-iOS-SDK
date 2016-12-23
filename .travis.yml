@@ -1,0 +1,7 @@
+language: objective-c
+osx_image: xcode8.1
+script:
+- python Example/Scripts/config.py -s $HOST_ID -t $TENANT_ID -a $ADMIN_KEY
+- xcodebuild -version
+- xcodebuild -showsdks
+- xcodebuild -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -destination "platform=iOS Simulator,name=iPhone 7" -sdk iphonesimulator -configuration Debug test
