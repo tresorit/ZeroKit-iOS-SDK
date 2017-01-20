@@ -34,10 +34,22 @@ github "ZeroKit/ZeroKit"
 Run `carthage update` to build the framework and drag the built ZeroKit.framework into your Xcode project.
 
 ### CocoaPods
-CocoaPods is currently not supported. We plan to add support later.
+[CocoaPods](https://cocoapods.org) is a dependency manager for Swift and Objective-C Cocoa projects.
 
-### Swift Package Manager
-Swift Package Manager is currently not supported. We plan to add support later.
+To integrate ZeroKit into your Xcode project using CocoaPods, specify it in your Podfile:
+
+```ruby
+target '<Your Target>' do
+  use_frameworks!
+  pod 'ZeroKit', '~> 4.0'
+end
+```
+
+Then, install it with the following command:
+
+```
+$ pod install
+```
 
 ## Usage
 
@@ -157,4 +169,4 @@ Contact us at [zerokit@tresorit.com](mailto:zerokit@tresorit.com).
 
 ## License
 
-See the LICENSE.txt file.
+See the LICENSE file.
