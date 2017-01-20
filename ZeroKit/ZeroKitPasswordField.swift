@@ -20,7 +20,7 @@ import UIKit
     @objc optional func passwordFieldShouldBeginEditing(_ passwordField: ZeroKitPasswordField) -> Bool
     
     /**
-     Became first responder.
+     The password field became first responder.
      */
     @objc optional func passwordFieldDidBeginEditing(_ passwordField: ZeroKitPasswordField)
     

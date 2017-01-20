@@ -13,7 +13,7 @@ public class ZeroKitConfig: NSObject, NSCopying {
     public private(set) var apiUrl: URL
     
     /**
-     Specify the access group if you app needs one.
+     Specify the keychain access group if your app needs one.
      */
     public var keychainAccessGroup: String?
     
@@ -372,6 +372,11 @@ public extension ZeroKit {
     
     /**
      Prefer using `login(with userId: String, passwordField: ZeroKitPasswordField, rememberMe: Bool, completion: @escaping UserIdCallback)` to avoid handling the user's password.
+     
+     - parameter userId: User ID
+     - parameter password: User password
+     - parameter rememberMe: Set to true if you want to log in the user without password by calling `loginWithRememberMe`
+     - parameter completion: Called when login finishes
      */
     public func login(withUserId userId: String, password: String, rememberMe: Bool, completion: @escaping DefaultCompletion) {
         if rememberMe {
@@ -442,7 +447,7 @@ public extension ZeroKit {
     }
     
     /**
-     Logout. If the user logged in with 'remember me' option, then they will be forgotten.
+     Logout. If the user logged in with 'remember me' option, then they will have to re-enter their password to access any data.
      
      - parameter completion: Called when logout finishes
      */
