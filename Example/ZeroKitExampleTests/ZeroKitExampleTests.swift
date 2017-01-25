@@ -19,8 +19,12 @@ class ZeroKitExampleTests: XCTestCase {
     }
     
     func resetZeroKit() {
+        self.zeroKit = createZeroKit()
+    }
+    
+    func createZeroKit() -> ZeroKit {
         let zeroKitConfig = ZeroKitConfig(apiUrl: zeroKitApiUrl)
-        zeroKit = try! ZeroKit(config: zeroKitConfig)
+        let zeroKit = try! ZeroKit(config: zeroKitConfig)
         
         let expectation = self.expectation(description: "ZeroKit setup")
         
@@ -38,9 +42,13 @@ class ZeroKitExampleTests: XCTestCase {
         }
         
         waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        return zeroKit
     }
     
-    func registerUser() -> TestUser {
+    func registerUser(usingZeroKit: ZeroKit? = nil) -> TestUser {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        
         var expectation = self.expectation(description: "Init registration")
         
         var userId: String!
@@ -89,7 +97,8 @@ class ZeroKitExampleTests: XCTestCase {
         return TestUser(id: userId, password: password)
     }
     
-    func loginUser(_ user: TestUser, rememberMe: Bool = false, expectError: ZeroKitError? = nil) {
+    func loginUser(_ user: TestUser, usingZeroKit: ZeroKit? = nil, rememberMe: Bool = false, expectError: ZeroKitError? = nil) {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
         let expectation = self.expectation(description: "Login")
         zeroKit.login(withUserId: user.id, password: user.password, rememberMe: rememberMe) { error in
             if let error = error {
@@ -117,7 +126,8 @@ class ZeroKitExampleTests: XCTestCase {
         waitForExpectations(timeout: defaultTimeout, handler: nil)
     }
     
-    func logout() {
+    func logout(usingZeroKit: ZeroKit? = nil) {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
         let expectation = self.expectation(description: "Logout")
         zeroKit.logout { error in
             guard error == nil else {
@@ -141,7 +151,9 @@ class ZeroKitExampleTests: XCTestCase {
         return userId
     }
     
-    func createTresor() -> String {
+    func createTresor(usingZeroKit: ZeroKit? = nil) -> String {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        
         var tresorId: String!
         
         let expectation = self.expectation(description: "Tresor creation")
@@ -161,6 +173,44 @@ class ZeroKitExampleTests: XCTestCase {
         
         waitForExpectations(timeout: defaultTimeout, handler: nil)
         return tresorId
+    }
+    
+    func shareTresor(tresorId: String, withUser userId: String, usingZeroKit: ZeroKit? = nil) {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Tresor sharing")
+        
+        zeroKit.share(tresorWithId: tresorId, withUser: userId) { shareId, error in
+            guard error == nil else {
+                XCTFail("Tresor sharing failed: \(error!)")
+                return
+            }
+            
+            self.mockApp.approveShare(shareId!, approve: true) { success in
+                XCTAssertTrue(success)
+                expectation.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+    }
+    
+    func kickUser(userId: String, fromTresor tresorId: String, usingZeroKit: ZeroKit? = nil) {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Kicking user")
+        
+        zeroKit.kick(userWithId: userId, fromTresor: tresorId) { operationId, error in
+            guard error == nil else {
+                XCTFail("Kicking user failed: \(error!)")
+                return
+            }
+            
+            self.mockApp.approveKick(operationId!, approve: true) { success in
+                XCTAssertTrue(success)
+                expectation.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
     }
     
     func getInvitationLinkInfo(_ link: InvitationLink) -> InvitationLinkPublicInfo {
@@ -198,6 +248,86 @@ class ZeroKitExampleTests: XCTestCase {
         waitForExpectations(timeout: defaultTimeout, handler: nil)
         
         return TestUser(id: user.id, password: newPassword)
+    }
+    
+    func encrypt(plainText: String, inTresor tresorId: String, usingZeroKit: ZeroKit? = nil) -> String {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Text encryption")
+        
+        var cipherText: String!
+        zeroKit.encrypt(plainText: plainText, inTresor: tresorId) { aCipherText, error in
+            guard error == nil else {
+                XCTFail("Text encrpytion failed: \(error!)")
+                return
+            }
+            
+            cipherText = aCipherText
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        return cipherText
+    }
+    
+    func decrypt(cipherText: String, usingZeroKit: ZeroKit? = nil) -> String {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Text decryption")
+        
+        var plainText: String!
+        zeroKit.decrypt(cipherText: cipherText) { aPlainText, error in
+            guard error == nil else {
+                XCTFail("Text decryption failed: \(error!)")
+                return
+            }
+            
+            plainText = aPlainText
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        return plainText
+    }
+    
+    func encrypt(plainData: Data, inTresor tresorId: String, usingZeroKit: ZeroKit? = nil) -> Data {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Data encryption")
+        
+        var cipherData: Data!
+        zeroKit.encrypt(plainData: plainData, inTresor: tresorId) { aCipherData, error in
+            guard error == nil else {
+                XCTFail("Data encrpytion failed: \(error!)")
+                return
+            }
+            
+            cipherData = aCipherData
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        return cipherData
+    }
+    
+    func decrypt(cipherData: Data, usingZeroKit: ZeroKit? = nil) -> Data {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
+        let expectation = self.expectation(description: "Data decryption")
+        
+        var plainData: Data!
+        zeroKit.decrypt(cipherData: cipherData) { aPlainData, error in
+            guard error == nil else {
+                XCTFail("Data decryption failed: \(error!)")
+                return
+            }
+            
+            plainData = aPlainData
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+
+        return plainData
     }
     
     // MARK: tests
@@ -289,36 +419,9 @@ class ZeroKitExampleTests: XCTestCase {
         loginUser(user)
         let tresorId = createTresor()
         
-        var expectation = self.expectation(description: "Text encryption")
-        
         let plainText = "This is the text to be encrypted"
-        var cipherText: String!
-        zeroKit.encrypt(plainText: plainText, inTresor: tresorId) { aCipherText, error in
-            guard error == nil else {
-                XCTFail("Text encrpytion failed: \(error!)")
-                return
-            }
-            
-            cipherText = aCipherText
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
-        
-        expectation = self.expectation(description: "Text decryption")
-        
-        var plainText2: String!
-        zeroKit.decrypt(cipherText: cipherText) { aPlainText, error in
-            guard error == nil else {
-                XCTFail("Text decryption failed: \(error!)")
-                return
-            }
-            
-            plainText2 = aPlainText
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        let cipherText = encrypt(plainText: plainText, inTresor: tresorId)
+        let plainText2 = decrypt(cipherText: cipherText)
         
         XCTAssertTrue(plainText == plainText2)
         
@@ -330,36 +433,9 @@ class ZeroKitExampleTests: XCTestCase {
         loginUser(user)
         let tresorId = createTresor()
         
-        var expectation = self.expectation(description: "Data encryption")
-        
         let plainData = "This is the data to be encrypted".data(using: String.Encoding.utf8)!
-        var cipherData: Data!
-        zeroKit.encrypt(plainData: plainData, inTresor: tresorId) { aCipherData, error in
-            guard error == nil else {
-                XCTFail("Data encrpytion failed: \(error!)")
-                return
-            }
-            
-            cipherData = aCipherData
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
-        
-        expectation = self.expectation(description: "Data decryption")
-        
-        var plainData2: Data!
-        zeroKit.decrypt(cipherData: cipherData) { aPlainData, error in
-            guard error == nil else {
-                XCTFail("Data decryption failed: \(error!)")
-                return
-            }
-            
-            plainData2 = aPlainData
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        let cipherData = encrypt(plainData: plainData, inTresor: tresorId)
+        let plainData2 = decrypt(cipherData: cipherData)
         
         XCTAssertTrue(plainData == plainData2)
         
@@ -373,37 +449,8 @@ class ZeroKitExampleTests: XCTestCase {
         loginUser(user1)
         let tresorId = createTresor()
         
-        var expectation = self.expectation(description: "Tresor sharing")
-        
-        zeroKit.share(tresorWithId: tresorId, withUser: user2.id) { shareId, error in
-            guard error == nil else {
-                XCTFail("Tresor sharing failed: \(error!)")
-                return
-            }
-            
-            self.mockApp.approveShare(shareId!, approve: true) { success in
-                XCTAssertTrue(success)
-                expectation.fulfill()
-            }
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
-        
-        expectation = self.expectation(description: "Kicking user")
-        
-        zeroKit.kick(userWithId: user2.id, fromTresor: tresorId) { operationId, error in
-            guard error == nil else {
-                XCTFail("Kicking user failed: \(error!)")
-                return
-            }
-            
-            self.mockApp.approveKick(operationId!, approve: true) { success in
-                XCTAssertTrue(success)
-                expectation.fulfill()
-            }
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        shareTresor(tresorId: tresorId, withUser: user2.id)
+        kickUser(userId: user2.id, fromTresor: tresorId)
     }
     
     func testInvitationLinkNoPassword() {
@@ -519,5 +566,33 @@ class ZeroKitExampleTests: XCTestCase {
         }
         
         waitForExpectations(timeout: defaultTimeout, handler: nil)
+    }
+    
+    func testTwoSimultaneousUsers() {
+        let zeroKit1 = createZeroKit()
+        let zeroKit2 = createZeroKit()
+        
+        let user1 = registerUser()
+        let user2 = registerUser()
+        
+        loginUser(user1, usingZeroKit: zeroKit1)
+        loginUser(user2, usingZeroKit: zeroKit2)
+        
+        let tresorId = createTresor(usingZeroKit: zeroKit1)
+        
+        let plainText = "Plain text"
+        
+        // encrypt with user1
+        let cipherText = encrypt(plainText: plainText, inTresor: tresorId, usingZeroKit: zeroKit1)
+        
+        shareTresor(tresorId: tresorId, withUser: user2.id, usingZeroKit: zeroKit1)
+        
+        // decrypt with user2
+        let plainText2 = decrypt(cipherText: cipherText, usingZeroKit: zeroKit2)
+        
+        XCTAssertTrue(plainText == plainText2)
+        
+        logout(usingZeroKit: zeroKit1)
+        logout(usingZeroKit: zeroKit2)
     }
 }
