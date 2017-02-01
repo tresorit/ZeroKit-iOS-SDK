@@ -60,7 +60,7 @@ To initalize the SDK you will need your API URL:
 ```swift
 import ZeroKit
 
-let zeroKitConfig = ZeroKitConfig(apiUrl: URL(string: "https://{tenantid}.api.tresorit.io/static/v4/api.html")!)
+let zeroKitConfig = ZeroKitConfig(apiUrl: URL(string: "https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html")!)
 let zeroKit = try! ZeroKit(config: zeroKitConfig)
 ```
 
@@ -68,7 +68,7 @@ let zeroKit = try! ZeroKit(config: zeroKitConfig)
 ```objc
 #import <ZeroKit/ZeroKit-Swift.h>
 
-NSURL *apiURL = [NSURL URLWithString:@"https://{tenantid}.api.tresorit.io/static/v4/api.html"];
+NSURL *apiURL = [NSURL URLWithString:@"https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html"];
 ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiUrl:apiURL];
 NSError *error = nil;
 ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
@@ -132,7 +132,7 @@ In the `ZeroKitExample/Info.plist` file set the value of the `ZeroKitAPIURL` to 
 
 ```xml
 <key>ZeroKitAPIURL</key>
-<string>https://{tenantid}.api.tresorit.io/static/v4/api.html</string>
+<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html</string>
 ``` 
 
 In the `ZeroKitExample/ExampleAppMock/ExampleAppMock.plist` set the values for `AdminUserId`, `AdminKey` and `ApiRoot` (tenant URL). If this file does not exist then copy the sample `ExampleAppMock.sample.plist` file in the same directory to create one:
@@ -143,7 +143,7 @@ In the `ZeroKitExample/ExampleAppMock/ExampleAppMock.plist` set the values for `
 <key>AdminKey</key>
 <string>{adminkey}</string>
 <key>ApiRoot</key>
-<string>https://{tenantid}.api.tresorit.io</string>
+<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}</string>
 ```
 
 **!!! IMPORTANT NOTE:** You must **never include your Admin key in your application**. All Admin key calls must be done by your backend. We implemented a mock application in this example so you can run it without setting up a server. The admin key must be kept secret and not included in any client applications that you distribute.
@@ -156,7 +156,7 @@ You can also take a look at the unit tests in this project to see further exampl
 
 ```xml
 <key>ZeroKitAPIURL</key>
-<string>https://{tenantid}.api.tresorit.io/static/v4/api.html</string>
+<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html</string>
 ``` 
 
 ## Known Issues and Limitations
