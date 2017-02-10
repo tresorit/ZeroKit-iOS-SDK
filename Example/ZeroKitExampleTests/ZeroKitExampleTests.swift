@@ -140,7 +140,8 @@ class ZeroKitExampleTests: XCTestCase {
         waitForExpectations(timeout: defaultTimeout, handler: nil)
     }
     
-    func whoAmI() -> String? {
+    func whoAmI(usingZeroKit: ZeroKit? = nil) -> String? {
+        let zeroKit = usingZeroKit ?? self.zeroKit!
         let expectation = self.expectation(description: "Who am I?")
         var userId: String?
         zeroKit.whoAmI { aUserId, error in
@@ -577,6 +578,9 @@ class ZeroKitExampleTests: XCTestCase {
         
         loginUser(user1, usingZeroKit: zeroKit1)
         loginUser(user2, usingZeroKit: zeroKit2)
+        
+        XCTAssertTrue(whoAmI(usingZeroKit: zeroKit1)! == user1.id)
+        XCTAssertTrue(whoAmI(usingZeroKit: zeroKit2)! == user2.id)
         
         let tresorId = createTresor(usingZeroKit: zeroKit1)
         
