@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>AdminUserId</key>
-	<string>admin@{tenantid}.tresorit.io</string>
+	<string>admin@{TenantId}.tresorit.io</string>
 	<key>AdminKey</key>
-	<string>{adminkey}</string>
+	<string>{AdminKey}</string>
 	<key>ApiRoot</key>
-	<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}</string>
+	<string>{TenantBaseUrl}</string>
 </dict>
 </plist>

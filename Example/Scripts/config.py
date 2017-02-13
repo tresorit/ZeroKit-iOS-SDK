@@ -4,7 +4,9 @@ import shutil
 import os
 import argparse
 
-def prepareSource(hostId, tenantId, adminKey):
+def prepareSource(baseUrl, tenantId, adminKey):
+	baseUrl = baseUrl.rstrip("/")
+	
 	scriptDir = os.path.dirname(os.path.realpath(__file__))
 
 	configFiles = []
@@ -29,9 +31,9 @@ def prepareSource(hostId, tenantId, adminKey):
 		with open(filepath, 'r') as file :
 			filedata = file.read()
 
-		filedata = filedata.replace('{hostid}', hostId)
-		filedata = filedata.replace('{tenantid}', tenantId)
-		filedata = filedata.replace('{adminkey}', adminKey)
+		filedata = filedata.replace('{TenantBaseUrl}', baseUrl)
+		filedata = filedata.replace('{TenantId}', tenantId)
+		filedata = filedata.replace('{AdminKey}', adminKey)
 
 		with open(filepath, 'w') as file:
 			file.write(filedata)
@@ -40,11 +42,11 @@ def prepareSource(hostId, tenantId, adminKey):
 
 def argParser():
 	parser = argparse.ArgumentParser(description='Configure ZeroKit example app')
-	parser.add_argument('-s', '--hostid', help='Your host ID.', required=True)
+	parser.add_argument('-b', '--baseurl', help='Your API base URL.', required=True)
 	parser.add_argument('-t', '--tenantid', help='Your tenant ID.', required=True)
 	parser.add_argument('-a', '--adminkey', help='Your admin key.', required=True)
 	return parser
 
 if __name__ == '__main__':
 	args = argParser().parse_args()
-	prepareSource(args.hostid, args.tenantid, args.adminkey)
+	prepareSource(args.baseurl, args.tenantid, args.adminkey)

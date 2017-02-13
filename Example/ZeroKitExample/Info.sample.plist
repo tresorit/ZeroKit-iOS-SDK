@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>ZeroKitAPIURL</key>
-	<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html</string>
+	<string>{TenantBaseUrl}/static/v4/api.html</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>

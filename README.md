@@ -132,18 +132,18 @@ In the `ZeroKitExample/Info.plist` file set the value of the `ZeroKitAPIURL` to 
 
 ```xml
 <key>ZeroKitAPIURL</key>
-<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html</string>
+<string>{TenantBaseUrl}/static/v4/api.html</string>
 ``` 
 
 In the `ZeroKitExample/ExampleAppMock/ExampleAppMock.plist` set the values for `AdminUserId`, `AdminKey` and `ApiRoot` (tenant URL). If this file does not exist then copy the sample `ExampleAppMock.sample.plist` file in the same directory to create one:
 
 ```xml
 <key>AdminUserId</key>
-<string>admin@{tenantid}.tresorit.io</string>
+<string>admin@{TenantId}.tresorit.io</string>
 <key>AdminKey</key>
-<string>{adminkey}</string>
+<string>{AdminKey}</string>
 <key>ApiRoot</key>
-<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}</string>
+<string>{TenantBaseUrl}</string>
 ```
 
 **!!! IMPORTANT NOTE:** You must **never include your Admin key in your application**. All Admin key calls must be done by your backend. We implemented a mock application in this example so you can run it without setting up a server. The admin key must be kept secret and not included in any client applications that you distribute.
@@ -156,7 +156,7 @@ You can also take a look at the unit tests in this project to see further exampl
 
 ```xml
 <key>ZeroKitAPIURL</key>
-<string>https://host-{hostid}.api.tresorit.io/tenant-{tenantid}/static/v4/api.html</string>
+<string>{TenantBaseUrl}/static/v4/api.html</string>
 ``` 
 
 ## Known Issues and Limitations
