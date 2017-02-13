@@ -39,6 +39,11 @@ import Foundation
     /** The caller user is not member of the tresor. */
     case callerUserIsNotMemberOfTresor
     
+    /** Received invalid input. */
+    case badInput
+    
+    /** Invalid user ID was provided. */
+    case invalidUserId
     
     static func from(_ result: AnyObject) -> ZeroKitError {
         guard let dict = result as? [AnyHashable: AnyObject],
@@ -47,6 +52,10 @@ import Foundation
         }
         
         switch code {
+        case "BadInput":
+            return .badInput
+        case "InvalidUserId":
+            return .invalidUserId
         case "AlreadyMember":
             return .alreadyMember
         case "InvalidAuthorization":

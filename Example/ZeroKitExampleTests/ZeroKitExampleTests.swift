@@ -343,9 +343,9 @@ class ZeroKitExampleTests: XCTestCase {
         logout()
     }
     
-    func testLoginWithNonexistentUser() {
-        let user = TestUser(id: "NoSuchUser", password: "Password")
-        loginUser(user, expectError: ZeroKitError.userDoesNotExist)
+    func testLoginWithInvalidUser() {
+        let user = TestUser(id: "InvalidUserID", password: "Password")
+        loginUser(user, expectError: ZeroKitError.invalidUserId)
     }
     
     func testLoginWithInvalidPassword() {

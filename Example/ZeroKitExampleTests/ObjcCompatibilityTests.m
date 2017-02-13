@@ -228,9 +228,9 @@
     [self logout];
 }
 
-- (void)testLoginWithNonexistentUser {
-    TestUser *user = [[TestUser alloc] initWithId:@"NoSuchUser" password:@"Password"];
-    [self loginUser:user rememberMe:NO expectErrorCode:ZeroKitErrorUserDoesNotExist];
+- (void)testLoginWithInvalidUser {
+    TestUser *user = [[TestUser alloc] initWithId:@"InvalidUserID" password:@"Password"];
+    [self loginUser:user rememberMe:NO expectErrorCode:ZeroKitErrorInvalidUserId];
 }
 
 - (void)testLoginWithInvalidPassword {
