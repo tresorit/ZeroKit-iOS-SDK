@@ -500,4 +500,20 @@
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
 }
 
+- (void)testPasswordStrength {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Getting password strenth"];
+    
+    PasswordStrength *__block s = nil;
+    
+    [self.zeroKit passwordStrengthWithPassword:@"vkntF2e@FBW7" completion:^(PasswordStrength * _Nullable strength, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        s = strength;
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
+    
+    XCTAssertNotNil(s);
+}
+
 @end

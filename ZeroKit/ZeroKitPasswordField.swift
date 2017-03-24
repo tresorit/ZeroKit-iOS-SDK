@@ -102,10 +102,21 @@ public class ZeroKitPasswordField: UIView {
     }
     
     /**
-     `true` if the entered password is valid
+     Get the length of the typed password.
      */
+    public var passwordLength: Int {
+        return self.password.characters.count
+    }
+    
+    /**
+     `true` if the entered password is valid
+     
+     **Deprecated.** Use the `passwordStrength` method on a `ZeroKit` object to get the password strength.
+     
+     - note: ZeroKit does not specify requirements for passwords, so technically any password that is at least 1 character long is valid. Use the password strength to enforce requirements for your app.
+     */
+    @available(*, deprecated: 4.0.3, message: "Use the `passwordStrength` method on a `ZeroKit` object to get the password strength.")
     public func isPasswordValid() -> Bool {
-        // TODO: add proper validation, return validation errors
         return self.password.characters.count > 0
     }
     

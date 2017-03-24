@@ -10,6 +10,7 @@
 		E762F0651D9C193500170D9F /* ZeroKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E762F0631D9C193500170D9F /* ZeroKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E762F06D1D9C199E00170D9F /* ZeroKit.js in Resources */ = {isa = PBXBuildFile; fileRef = E762F06B1D9C199E00170D9F /* ZeroKit.js */; };
 		E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E762F06C1D9C199E00170D9F /* ZeroKit.swift */; };
+		E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */; };
 		E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */; };
 		E7F661511E00427F007D60A8 /* ZeroKitPasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */; };
 /* End PBXBuildFile section */
@@ -20,6 +21,7 @@
 		E762F0641D9C193500170D9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E762F06B1D9C199E00170D9F /* ZeroKit.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ZeroKit.js; sourceTree = "<group>"; };
 		E762F06C1D9C199E00170D9F /* ZeroKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKit.swift; sourceTree = "<group>"; };
+		E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordStrength.swift; sourceTree = "<group>"; };
 		E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitError.swift; sourceTree = "<group>"; };
 		E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitPasswordField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,6 +62,7 @@
 				E762F06C1D9C199E00170D9F /* ZeroKit.swift */,
 				E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */,
 				E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */,
+				E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */,
 			);
 			path = ZeroKit;
 			sourceTree = "<group>";
@@ -148,6 +151,7 @@
 				E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */,
 				E7F661511E00427F007D60A8 /* ZeroKitPasswordField.swift in Sources */,
 				E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */,
+				E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

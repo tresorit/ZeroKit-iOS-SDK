@@ -1,16 +1,78 @@
 import UIKit
 import ZeroKit
 
-class SignUpViewController: UIViewController {
+class SignUpViewController: UIViewController, ZeroKitPasswordFieldDelegate {
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var passwordTextField: ZeroKitPasswordField!
     @IBOutlet weak var passwordConfirmationTextField: ZeroKitPasswordField!
+    @IBOutlet weak var passwordStrengthLabel: UILabel!
+    @IBOutlet weak var passwordsMatchLabel: UILabel!
     @IBOutlet weak var signUpButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        passwordTextField.delegate = self
+        passwordConfirmationTextField.delegate = self
         passwordTextField.matchingField = passwordConfirmationTextField
+        
+        checkPassword()
+    }
+    
+    // Password field delegate
+    func passwordFieldContentsChanged(_ passwordField: ZeroKitPasswordField) {
+        checkPassword()
+    }
+    
+    func checkPassword() {
+        updatePasswordStrength()
+        updatePasswordMatch()
+    }
+    
+    func updatePasswordStrength() {
+        AppDelegate.current.zeroKit!.passwordStrength(passwordField: passwordTextField) { strength, error in
+            guard let strength = strength else {
+                return
+            }
+            
+            if strength.length == 0 {
+                self.passwordStrengthLabel.text = nil
+                return
+            }
+            
+            switch strength.score {
+            case .tooGuessable:
+                self.passwordStrengthLabel.text = "Bad password"
+                self.passwordStrengthLabel.textColor = UIColor(red: 226/255.0, green: 24/255.0, blue: 12/255.0, alpha: 1.0)
+            case .veryGuessable:
+                self.passwordStrengthLabel.text = "Weak password"
+                self.passwordStrengthLabel.textColor = UIColor(red: 237/255.0, green: 123/255.0, blue: 24/255.0, alpha: 1.0)
+            case .somewhatGuessable:
+                self.passwordStrengthLabel.text = "Fair password"
+                self.passwordStrengthLabel.textColor = UIColor(red: 237/255.0, green: 123/255.0, blue: 24/255.0, alpha: 1.0)
+            case .safelyUnguessable:
+                self.passwordStrengthLabel.text = "Good password"
+                self.passwordStrengthLabel.textColor = UIColor(red: 80/255.0, green: 138/255.0, blue: 5/255.0, alpha: 1.0)
+            case .veryUnguessable:
+                self.passwordStrengthLabel.text = "Great password"
+                self.passwordStrengthLabel.textColor = UIColor(red: 80/255.0, green: 138/255.0, blue: 5/255.0, alpha: 1.0)
+            }
+        }
+    }
+    
+    func updatePasswordMatch() {
+        if passwordTextField.isEmpty {
+            self.passwordsMatchLabel.text = nil
+            return
+        }
+        
+        if passwordTextField.passwordsMatch {
+            passwordsMatchLabel.text = "Passwords match"
+            passwordsMatchLabel.textColor = UIColor(red: 80/255.0, green: 138/255.0, blue: 5/255.0, alpha: 1.0)
+        } else {
+            passwordsMatchLabel.text = "Passwords do not match"
+            passwordsMatchLabel.textColor = UIColor(red: 226/255.0, green: 24/255.0, blue: 12/255.0, alpha: 1.0)
+        }
     }
     
     @IBAction func signUpButtonTap(_ sender: AnyObject) {

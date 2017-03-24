@@ -45,7 +45,7 @@ import Foundation
     /** Invalid user ID was provided. */
     case invalidUserId
     
-    static func from(_ result: AnyObject) -> ZeroKitError {
+    static func from(_ result: Any?) -> ZeroKitError {
         guard let dict = result as? [AnyHashable: AnyObject],
             let code = dict["code"] as? String else {
                 return .unexpectedResult

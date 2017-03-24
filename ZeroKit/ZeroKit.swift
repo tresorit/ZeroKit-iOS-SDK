@@ -157,13 +157,13 @@ public class ZeroKit: NSObject {
         return escaped;
     }
     
-    fileprivate func runJavascript(_ js: String, completion: ((/*error:*/ NSError?) -> Void)? = nil) {
+    fileprivate func runJavascript(_ js: String, completion: ((Any?, Error?) -> Void)? = nil) {
         self.webView?.evaluateJavaScript(js, completionHandler: { (obj: Any?, error: Error?) in
             if error != nil {
                 print("ZeroKit error: \(error!)")
             }
             if completion != nil {
-                completion!(error as NSError?)
+                completion!(obj, error)
             }
         })
     }
@@ -321,7 +321,36 @@ public extension ZeroKit {
     public typealias InvitationLinkCompletion = (InvitationLink?, NSError?) -> Void
     public typealias InvitationLinkInfoCompletion = (InvitationLinkPublicInfo?, NSError?) -> Void
     public typealias OperationIdCompletion = (/* operation ID */ String?, NSError?) -> Void
+    public typealias PasswordStrengthCallback = (PasswordStrength?, NSError?) -> Void
     
+    /**
+     Estimate the strength of a password.
+     
+     - parameter passwordField: The password field containing the password typed by the user.
+     - parameter completion: Called when the strength calculation completes.
+     */
+    public func passwordStrength(passwordField: ZeroKitPasswordField, completion: @escaping PasswordStrengthCallback) {
+        passwordStrength(password: passwordField.password, completion: completion)
+    }
+    
+    /**
+     Prefer using `passwordStrength(passwordField: ZeroKitPasswordField, userData: [String]? = nil, completion: @escaping PasswordStrengthCallback)` to avoid handling the user's password.
+     
+     - parameter password: The password.
+     - parameter completion: Called when the strength calculation completes.
+     */
+    public func passwordStrength(password: String, completion: @escaping PasswordStrengthCallback) {
+        let pwParam = escapeParameter(password)
+        runJavascript("zxcvbn(\"\(pwParam)\")") { result, error in
+            DispatchQueue.main.async {
+                if let dict = result as? [String: Any], let strength = PasswordStrength(strengthDictionary: dict) {
+                    completion(strength, nil)
+                } else {
+                    completion(nil, ZeroKitError.from(result).nserrorValue)
+                }
+            }
+        }
+    }
     
     /**
      Register a user. This is the second step of the 3-step registration flow. Before this method is called a user registration session must be initialized through the administration API of the ZeroKit backend. For more information on the registration flow please refer to the ZeroKit documentation.
