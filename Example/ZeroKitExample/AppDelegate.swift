@@ -21,12 +21,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         mockApp = ExampleAppMock()
         
-        let zeroKitApiUrl = URL(string: Bundle.main.infoDictionary!["ZeroKitAPIURL"] as! String)!
-        let zeroKitConfig = ZeroKitConfig(apiUrl: zeroKitApiUrl)
+        let apiBaseUrl = URL(string: Bundle.main.infoDictionary!["ZeroKitAPIBaseURL"] as! String)!
+        let zeroKitConfig = ZeroKitConfig(apiBaseUrl: apiBaseUrl)
         zeroKit = try! ZeroKit(config: zeroKitConfig)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(zeroKitDidLoad), name: ZeroKit.DidLoadNotification, object: zeroKit!)
-        NotificationCenter.default.addObserver(self, selector: #selector(zeroKitDidFailLoading), name: ZeroKit.DidFailLoadingNotification, object: zeroKit!)
+        showSigninScreen()
         
         return true
     }
@@ -54,15 +53,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 mainSb.instantiateViewController(withIdentifier: "DecryptViewController"),
                                 mainSb.instantiateViewController(withIdentifier: "AccountViewController")]
         return tabs
-    }
-    
-    @objc fileprivate func zeroKitDidLoad(_ notification: Notification) {
-        self.showSigninScreen()
-    }
-    
-    @objc fileprivate func zeroKitDidFailLoading(_ notification: Notification) {
-        // Handle error, retry...
-        self.window?.rootViewController?.showAlert("Failed to load ZeroKit API")
     }
     
     fileprivate var progressView: UIView?

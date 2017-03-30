@@ -45,7 +45,32 @@ import Foundation
     /** Invalid user ID was provided. */
     case invalidUserId
     
+    /** A network error occurred. */
+    case networkError
+    
+    /** The response is not valid, ie. response verification failed. */
+    case invalidResponse
+    
+    /** The request is not valid. */
+    case invalidRequest
+    
+    /** An internal error occurred. */
+    case internalError
+    
+    /** User is not logged in. Login is required to perform the operation. */
+    case loginRequired
+    
+    /** Failed to load ZeroKit API. */
+    case apiLoadingError
+    
+    /** Request was interrupted by the user. */
+    case userInterrupted
+    
     static func from(_ result: Any?) -> ZeroKitError {
+        if let error = result as? ZeroKitError {
+            return error
+        }
+        
         guard let dict = result as? [AnyHashable: AnyObject],
             let code = dict["code"] as? String else {
                 return .unexpectedResult

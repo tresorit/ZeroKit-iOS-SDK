@@ -7,20 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E7180D301E5C35A50091482F /* InternalApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7180D2F1E5C35A50091482F /* InternalApi.swift */; };
+		E7180D321E5DB9A10091482F /* ZeroKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7180D311E5DB9A10091482F /* ZeroKitConfig.swift */; };
+		E7429DDE1E5B04DB0006BC2A /* CryptoSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = E7429DDC1E5B04DB0006BC2A /* CryptoSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7429DDF1E5B04DB0006BC2A /* CryptoSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = E7429DDD1E5B04DB0006BC2A /* CryptoSupport.m */; };
 		E762F0651D9C193500170D9F /* ZeroKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E762F0631D9C193500170D9F /* ZeroKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E762F06D1D9C199E00170D9F /* ZeroKit.js in Resources */ = {isa = PBXBuildFile; fileRef = E762F06B1D9C199E00170D9F /* ZeroKit.js */; };
 		E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E762F06C1D9C199E00170D9F /* ZeroKit.swift */; };
+		E78C1AF11E56F72F003E4B63 /* IdentityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */; };
 		E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */; };
 		E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */; };
 		E7F661511E00427F007D60A8 /* ZeroKitPasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E7180D2F1E5C35A50091482F /* InternalApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InternalApi.swift; sourceTree = "<group>"; };
+		E7180D311E5DB9A10091482F /* ZeroKitConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitConfig.swift; sourceTree = "<group>"; };
+		E7429DDC1E5B04DB0006BC2A /* CryptoSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CryptoSupport.h; sourceTree = "<group>"; };
+		E7429DDD1E5B04DB0006BC2A /* CryptoSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CryptoSupport.m; sourceTree = "<group>"; };
 		E762F0601D9C193500170D9F /* ZeroKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZeroKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E762F0631D9C193500170D9F /* ZeroKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZeroKit.h; sourceTree = "<group>"; };
 		E762F0641D9C193500170D9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E762F06B1D9C199E00170D9F /* ZeroKit.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ZeroKit.js; sourceTree = "<group>"; };
 		E762F06C1D9C199E00170D9F /* ZeroKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKit.swift; sourceTree = "<group>"; };
+		E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityProvider.swift; sourceTree = "<group>"; };
 		E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordStrength.swift; sourceTree = "<group>"; };
 		E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitError.swift; sourceTree = "<group>"; };
 		E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitPasswordField.swift; sourceTree = "<group>"; };
@@ -37,6 +47,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E7429DDB1E5B04A70006BC2A /* CryptoSupport */ = {
+			isa = PBXGroup;
+			children = (
+				E7429DDC1E5B04DB0006BC2A /* CryptoSupport.h */,
+				E7429DDD1E5B04DB0006BC2A /* CryptoSupport.m */,
+			);
+			path = CryptoSupport;
+			sourceTree = "<group>";
+		};
 		E762F0561D9C193500170D9F = {
 			isa = PBXGroup;
 			children = (
@@ -56,12 +75,16 @@
 		E762F0621D9C193500170D9F /* ZeroKit */ = {
 			isa = PBXGroup;
 			children = (
+				E7429DDB1E5B04A70006BC2A /* CryptoSupport */,
 				E762F0641D9C193500170D9F /* Info.plist */,
 				E762F0631D9C193500170D9F /* ZeroKit.h */,
 				E762F06B1D9C199E00170D9F /* ZeroKit.js */,
 				E762F06C1D9C199E00170D9F /* ZeroKit.swift */,
+				E7180D311E5DB9A10091482F /* ZeroKitConfig.swift */,
 				E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */,
 				E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */,
+				E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */,
+				E7180D2F1E5C35A50091482F /* InternalApi.swift */,
 				E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */,
 			);
 			path = ZeroKit;
@@ -75,6 +98,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E762F0651D9C193500170D9F /* ZeroKit.h in Headers */,
+				E7429DDE1E5B04DB0006BC2A /* CryptoSupport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,8 +172,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7180D321E5DB9A10091482F /* ZeroKitConfig.swift in Sources */,
+				E78C1AF11E56F72F003E4B63 /* IdentityProvider.swift in Sources */,
 				E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */,
 				E7F661511E00427F007D60A8 /* ZeroKitPasswordField.swift in Sources */,
+				E7180D301E5C35A50091482F /* InternalApi.swift in Sources */,
+				E7429DDF1E5B04DB0006BC2A /* CryptoSupport.m in Sources */,
 				E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */,
 				E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */,
 			);

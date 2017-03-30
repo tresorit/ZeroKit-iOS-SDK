@@ -23,27 +23,12 @@
 }
 
 - (void)resetZeroKit {
-    NSURL *apiURL = [NSURL URLWithString:[NSBundle mainBundle].infoDictionary[@"ZeroKitAPIURL"]];
-    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiUrl:apiURL];
+    NSURL *apiBaseURL = [NSURL URLWithString:[NSBundle mainBundle].infoDictionary[@"ZeroKitAPIBaseURL"]];
+    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiBaseURL];
     
     NSError *error = nil;
     self.zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
     XCTAssertNil(error);
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"ZeroKit setup"];
-    
-    id obsSucc = [[NSNotificationCenter defaultCenter] addObserverForName:[ZeroKit DidLoadNotification] object:self.zeroKit queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        [expectation fulfill];
-    }];
-    
-    id obsFail = [[NSNotificationCenter defaultCenter] addObserverForName:[ZeroKit DidFailLoadingNotification] object:self.zeroKit queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        XCTFail("Failed to load ZeroKit API");
-    }];
-    
-    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:obsSucc];
-    [[NSNotificationCenter defaultCenter] removeObserver:obsFail];
 }
 
 #pragma mark - Convenience
@@ -514,6 +499,24 @@
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
     
     XCTAssertNotNil(s);
+}
+
+- (void)testGetIdentityToken {
+    TestUser *user = [self registerUser];
+    [self loginUser:user];
+    
+    NSString *clientId = @"{Put your client ID here}";
+    XCTestExpectation *expectation = [self expectationWithDescription:@"IDP test"];
+    
+    [self.zeroKit getIdentityTokensWithClientId:clientId completion:^(ZeroKitIdentityTokens * _Nullable tokens, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(tokens);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
+    
+    [self logout];
 }
 
 @end

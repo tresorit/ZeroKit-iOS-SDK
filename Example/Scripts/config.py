@@ -11,11 +11,6 @@ def prepareSource(baseUrl, tenantId, adminKey):
 
 	configFiles = []
 
-	src = os.path.join(scriptDir, '../ZeroKitExampleTests/Info.sample.plist')
-	dst = os.path.join(scriptDir, '../ZeroKitExampleTests/Info.plist')
-	shutil.copyfile(src, dst)
-	configFiles.append(dst)
-
 	src = os.path.join(scriptDir, '../ZeroKitExample/Info.sample.plist')
 	dst = os.path.join(scriptDir, '../ZeroKitExample/Info.plist')
 	shutil.copyfile(src, dst)

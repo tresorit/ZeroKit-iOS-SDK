@@ -43,5 +43,4 @@ Carthage/Build
 # ZeroKit
 ExampleAppMock.plist
 Example/ZeroKitExample/Info.plist
-Example/ZeroKitExampleTests/Info.plist
 

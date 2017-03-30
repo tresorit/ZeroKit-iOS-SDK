@@ -5,7 +5,7 @@ class ZeroKitExampleTests: XCTestCase {
     
     let defaultTimeout: TimeInterval = 90
     let mockApp = ExampleAppMock()
-    let zeroKitApiUrl = URL(string: Bundle.main.infoDictionary!["ZeroKitAPIURL"] as! String)!
+    let apiBaseUrl = URL(string: Bundle.main.infoDictionary!["ZeroKitAPIBaseURL"] as! String)!
     var zeroKit: ZeroKit!
     
     override func setUp() {
@@ -23,27 +23,8 @@ class ZeroKitExampleTests: XCTestCase {
     }
     
     func createZeroKit() -> ZeroKit {
-        let zeroKitConfig = ZeroKitConfig(apiUrl: zeroKitApiUrl)
-        let zeroKit = try! ZeroKit(config: zeroKitConfig)
-        
-        let expectation = self.expectation(description: "ZeroKit setup")
-        
-        let obsSucc = NotificationCenter.default.addObserver(forName: ZeroKit.DidLoadNotification, object: zeroKit, queue: nil) { notification in
-            expectation.fulfill()
-        }
-        
-        let obsFail = NotificationCenter.default.addObserver(forName: ZeroKit.DidFailLoadingNotification, object: zeroKit, queue: nil) { notification in
-            XCTFail("Failed to load ZeroKit API")
-        }
-        
-        defer {
-            NotificationCenter.default.removeObserver(obsSucc)
-            NotificationCenter.default.removeObserver(obsFail)
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
-        
-        return zeroKit
+        let zeroKitConfig = ZeroKitConfig(apiBaseUrl: apiBaseUrl)
+        return try! ZeroKit(config: zeroKitConfig)
     }
     
     func registerUser(usingZeroKit: ZeroKit? = nil) -> TestUser {

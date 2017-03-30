@@ -1,81 +1,16 @@
-// ZeroKit iOS SDK
-// To learn more about ZeroKit or to sign up visit https://zerokit.org/
-
 import WebKit
-
-
-/**
- Configuration for ZeroKit.
- 
- Keychain configuration properties affect the storage of the "remember me" token.
- */
-public class ZeroKitConfig: NSObject, NSCopying {
-    public private(set) var apiUrl: URL
-    
-    /**
-     Specify the keychain access group if your app needs one.
-     */
-    public var keychainAccessGroup: String?
-    
-    /**
-     Keychain accessibility option. The default value is `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
-     
-     See Apple's documentation for Keychain Item Accessibility Constants that describes the possible values for the `kSecAttrAccessible` key.
-     */
-    public var keychainAccessibility: CFString
-    
-    /**
-     Initialize a configuration with the API URL.
-     
-     - parameter apiUrl: URL for the API
-     */
-    public init(apiUrl: URL) {
-        self.apiUrl = apiUrl
-        self.keychainAccessibility = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-    }
-    
-    public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = ZeroKitConfig(apiUrl: self.apiUrl)
-        copy.keychainAccessGroup = self.keychainAccessGroup
-        copy.keychainAccessibility = self.keychainAccessibility
-        return copy
-    }
-}
 
 /**
  The ZeroKit class provides the interface to the ZeroKit SDK on iOS.
+ 
+ - note: The ZeroKit API is not thread safe, call only from the main thread.
  */
 public class ZeroKit: NSObject {
     
-    // MARK: Notifications
-    
-    /**
-     `DidLoadNotification` notification is posted when the SDK is successfully loaded. `ZeroKit.isLoaded` is also set to `true`.
-     */
-    public static let DidLoadNotification = Notification.Name("ZeroKit.DidLoadNotification")
-    
-    /**
-     `DidFailLoadingNotification` notification is posted when loading the SDK fails. `ZeroKit.isLoaded` is `false` if it fails.
-     */
-    public static let DidFailLoadingNotification = Notification.Name("ZeroKit.DidFailLoadingNotification")
-    
-    
-    fileprivate typealias JsApiResultCallback = (/*success:*/ Bool, /*result:*/ AnyObject) -> Void
-    
-    /**
-     `true` if the SDK was successfully loaded, `false` otherwise. The SDK needs to be accessible at the provided URL when initializing ZeroKit.
-     */
-    public fileprivate(set) var isLoaded = false
-    
     fileprivate let config: ZeroKitConfig
-    fileprivate var webView: WKWebView?
-    fileprivate var callbacks = [String: JsApiResultCallback]()
-    fileprivate var webKitDelegate: ZeroKitWebKitDelegate!
-    
-    deinit {
-        self.webView?.stopLoading()
-        self.webView?.removeFromSuperview()
-    }
+    fileprivate var internalApi: InternalApi!
+    fileprivate var idpQuery: IdentityProvider?
+    fileprivate var nextIdpCalls = [(/*isCancelled: */Bool) -> Void]()
     
     /**
      Initialize ZeroKit with the configuration.
@@ -86,124 +21,14 @@ public class ZeroKit: NSObject {
     public init(config: ZeroKitConfig) throws {
         self.config = config.copy() as! ZeroKitConfig
         super.init()
-        self.webKitDelegate = ZeroKitWebKitDelegate(zeroKit: self)
-        try createWebView()
+        self.internalApi = InternalApi(apiUrl: config.apiUrl, webViewHostView: try ZeroKit.hostViewForWebView(), zeroKit: self)
     }
-    
-    fileprivate func createWebView() throws {
-        let controller = WKUserContentController()
-        let messageHandlerName = "ZeroKitHandler" // referenced in javascript
-        controller.add(self.webKitDelegate, name: messageHandlerName)
-        
-        let scriptJsUrl = Bundle(for: self.classForCoder).url(forResource: "ZeroKit", withExtension: "js")!
-        let scriptJs = try! String(contentsOf: scriptJsUrl)
-        let script = WKUserScript(source: scriptJs, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        controller.addUserScript(script)
-        
-        let config = WKWebViewConfiguration()
-        config.userContentController = controller;
-        
-        self.webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: config)
-        self.webView!.navigationDelegate = self.webKitDelegate
-        
-        // The web view must be added to the hierarchy to properly work and load content.
-        // It provides the runtime environment for the javascript API.
-        if let windowOptional = UIApplication.shared.delegate?.window, let window = windowOptional {
-            window.insertSubview(self.webView!, at: 0)
-        } else {
-            throw ZeroKitError.cannotAddWebView
+
+    fileprivate class func hostViewForWebView() throws -> UIView {
+        guard let windowOptional = UIApplication.shared.delegate?.window, let window = windowOptional else {
+            throw ZeroKitError.cannotAddWebView.nserrorValue
         }
-        
-        self.webView!.load(URLRequest(url: self.config.apiUrl))
-    }
-    
-    fileprivate func callMethod(_ methodOnObject: String, parameters: [String], callback: @escaping JsApiResultCallback) {
-        let paramStr = parameterString(parameters)
-        let callbackId = UUID().uuidString
-        callbacks[callbackId] = callback
-        
-        let object: String
-        if let lastDot = methodOnObject.range(of: ".", options: .backwards, range: nil, locale: nil) {
-            object = methodOnObject.substring(to: lastDot.lowerBound)
-        } else {
-            object = "null"
-        }
-        
-        var js = "ios_callApiMethod(\(object), \(methodOnObject), \"\(callbackId)\""
-        if paramStr.characters.count > 0 {
-            js.append(", \(paramStr)")
-        }
-        js.append(")")
-        
-        runJavascript(js)
-    }
-    
-    fileprivate func parameterString(_ parameters: [String]) -> String {
-        var escapedParams = [String]()
-        for p in parameters {
-            escapedParams.append("\"\(escapeParameter(p))\"")
-        }
-        return escapedParams.joined(separator: ",")
-    }
-    
-    fileprivate func escapeParameter(_ parameter: String) -> String {
-        var escaped = ""
-        
-        for unicode in parameter.unicodeScalars {
-            let val = unicode.value
-            escaped.append(String(format: "\\u%04x", val))
-        }
-        
-        return escaped;
-    }
-    
-    fileprivate func runJavascript(_ js: String, completion: ((Any?, Error?) -> Void)? = nil) {
-        self.webView?.evaluateJavaScript(js, completionHandler: { (obj: Any?, error: Error?) in
-            if error != nil {
-                print("ZeroKit error: \(error!)")
-            }
-            if completion != nil {
-                completion!(obj, error)
-            }
-        })
-    }
-    
-    fileprivate class ZeroKitWebKitDelegate: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
-        
-        fileprivate weak var zeroKit: ZeroKit?
-        init(zeroKit: ZeroKit) {
-            self.zeroKit = zeroKit
-        }
-        
-        // MARK: WKScriptMessageHandler
-        
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            let resultArray = message.body as! [AnyObject]
-            let success: Bool = (resultArray[0] as! NSNumber).boolValue;
-            let callbackId = resultArray[1] as! String
-            let resultValue = resultArray[2]
-            let callback = self.zeroKit?.callbacks[callbackId]
-            _ = self.zeroKit?.callbacks.removeValue(forKey: callbackId)
-            callback?(success, resultValue)
-        }
-        
-        // MARK: WKNavigationDelegate
-        
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            print("ZeroKit API loaded")
-            if let zeroKit = self.zeroKit {
-                zeroKit.isLoaded = true
-                NotificationCenter.default.post(name: ZeroKit.DidLoadNotification, object: zeroKit)
-            }
-        }
-        
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print("Failed loading ZeroKit API")
-            if let zeroKit = self.zeroKit {
-                zeroKit.isLoaded = false
-                NotificationCenter.default.post(name: ZeroKit.DidFailLoadingNotification, object: zeroKit)
-            }
-        }
+        return window
     }
 }
 
@@ -322,6 +147,7 @@ public extension ZeroKit {
     public typealias InvitationLinkInfoCompletion = (InvitationLinkPublicInfo?, NSError?) -> Void
     public typealias OperationIdCompletion = (/* operation ID */ String?, NSError?) -> Void
     public typealias PasswordStrengthCallback = (PasswordStrength?, NSError?) -> Void
+    public typealias IdentityTokensCompletion = (ZeroKitIdentityTokens?, NSError?) -> Void
     
     /**
      Estimate the strength of a password.
@@ -340,8 +166,8 @@ public extension ZeroKit {
      - parameter completion: Called when the strength calculation completes.
      */
     public func passwordStrength(password: String, completion: @escaping PasswordStrengthCallback) {
-        let pwParam = escapeParameter(password)
-        runJavascript("zxcvbn(\"\(pwParam)\")") { result, error in
+        let pwParam = internalApi.escapeParameter(password)
+        internalApi.runJavascript("zxcvbn(\"\(pwParam)\")") { result, error in
             DispatchQueue.main.async {
                 if let dict = result as? [String: Any], let strength = PasswordStrength(strengthDictionary: dict) {
                     completion(strength, nil)
@@ -378,7 +204,7 @@ public extension ZeroKit {
             return
         }
         
-        callMethod("mobileCmd.register", parameters: [userId, registrationId, password]) { success, result in
+        self.internalApi.callMethod("mobileCmd.register", parameters: [userId, registrationId, password]) { success, result in
             if let dict = result as? NSDictionary, let regValidationVerifier = dict["RegValidationVerifier"] as? String , success {
                 completion(regValidationVerifier, nil)
             } else {
@@ -419,7 +245,7 @@ public extension ZeroKit {
             }
             
         } else {
-            callMethod("mobileCmd.login", parameters: [userId, password]) { success, result in
+            self.internalApi.callMethod("mobileCmd.login", parameters: [userId, password]) { success, result in
                 if success {
                     completion(nil)
                 } else {
@@ -445,7 +271,7 @@ public extension ZeroKit {
     }
     
     private func loginByRememberMe(with userId: String, rememberMeKey: String, completion: @escaping DefaultCompletion) {
-        callMethod("mobileCmd.loginByRememberMeKey", parameters: [userId, rememberMeKey]) { success, result in
+        self.internalApi.callMethod("mobileCmd.loginByRememberMeKey", parameters: [userId, rememberMeKey]) { success, result in
             if let userId = result as? String , success {
                 _ = self.save(rememberMeKey: rememberMeKey, forUserId: userId)
                 completion(nil)
@@ -456,7 +282,7 @@ public extension ZeroKit {
     }
     
     private func getRememberMeKey(withUserId userId: String, password: String, completion: @escaping (String?, NSError?) -> Void) {
-        callMethod("mobileCmd.getRememberMeKey", parameters: [userId, password]) { success, result in
+        self.internalApi.callMethod("mobileCmd.getRememberMeKey", parameters: [userId, password]) { success, result in
             if let rememberMeKey = result as? String, success {
                 completion(rememberMeKey, nil)
             } else {
@@ -481,6 +307,8 @@ public extension ZeroKit {
      - parameter completion: Called when logout finishes
      */
     public func logout(completion: @escaping DefaultCompletion) {
+        cancelAllIdpRequests()
+        
         whoAmI { userId, error in
             guard error == nil else {
                 completion(error)
@@ -491,7 +319,7 @@ public extension ZeroKit {
                 _ = self.deleteRememberMeKey(forUserId: userId)
             }
             
-            self.callMethod("cmd.api.logout", parameters: []) { success, result in
+            self.internalApi.callMethod("cmd.api.logout", parameters: []) { success, result in
                 completion(success ? nil : ZeroKitError.from(result).nserrorValue)
             }
         }
@@ -521,7 +349,7 @@ public extension ZeroKit {
             return
         }
         
-        callMethod("mobileCmd.changePassword", parameters: [userId, currentPassword, newPassword]) { success, result in
+        self.internalApi.callMethod("mobileCmd.changePassword", parameters: [userId, currentPassword, newPassword]) { success, result in
             if success {
                 
                 if self.canLoginByRememberMe(with: userId) {
@@ -550,7 +378,7 @@ public extension ZeroKit {
      - parameter completion: Called when `whoAmI` finishes. Returns the user ID if logged in or `nil` if not.
      */
     public func whoAmI(completion: @escaping UserIdCompletion) {
-        callMethod("cmd.api.whoAmI", parameters: []) { success, result in
+        self.internalApi.callMethod("cmd.api.whoAmI", parameters: []) { success, result in
             if success {
                 let userId = result as? String
                 completion(userId, nil)
@@ -568,7 +396,7 @@ public extension ZeroKit {
      - parameter completion: Called when encryption finishes, contains the cipher text if successful
      */
     public func encrypt(plainText: String, inTresor tresorId: String, completion: @escaping CipherTextCompletion) {
-        callMethod("cmd.api.encrypt", parameters: [tresorId, plainText]) { success, result in
+        self.internalApi.callMethod("cmd.api.encrypt", parameters: [tresorId, plainText]) { success, result in
             if let cipherText = result as? String , success {
                 completion(cipherText, nil)
             } else {
@@ -586,7 +414,7 @@ public extension ZeroKit {
      - parameter completion: Called when decryption finishes, contains the plain text if successful
      */
     public func decrypt(cipherText: String, completion: @escaping PlainTextCompletion) {
-        callMethod("cmd.api.decrypt", parameters: [cipherText]) { success, result in
+        self.internalApi.callMethod("cmd.api.decrypt", parameters: [cipherText]) { success, result in
             if let plainText = result as? String , success {
                 completion(plainText, nil)
             } else {
@@ -604,7 +432,7 @@ public extension ZeroKit {
      */
     public func encrypt(plainData: Data, inTresor tresorId: String, completion: @escaping CipherDataCompletion) {
         let plainDataBase64 = plainData.base64EncodedString()
-        callMethod("ios_cmd_api_encryptBytes", parameters: [tresorId, plainDataBase64]) { success, result in
+        self.internalApi.callMethod("ios_cmd_api_encryptBytes", parameters: [tresorId, plainDataBase64]) { success, result in
             if let cipherDataBase64 = result as? String,
                 let cipherData = Data(base64Encoded: cipherDataBase64),
                 success {
@@ -623,7 +451,7 @@ public extension ZeroKit {
      */
     public func decrypt(cipherData: Data, completion: @escaping PlainDataCompletion) {
         let cipherDataBase64 = cipherData.base64EncodedString()
-        callMethod("ios_cmd_api_decryptBytes", parameters: [cipherDataBase64]) { success, result in
+        self.internalApi.callMethod("ios_cmd_api_decryptBytes", parameters: [cipherDataBase64]) { success, result in
             if let plainDataBase64 = result as? String,
                 let plainData = Data(base64Encoded: plainDataBase64),
                 success {
@@ -640,7 +468,7 @@ public extension ZeroKit {
      - parameter completion: Called when tresor creation finishes, contains the tresor ID if successful. Approve this tresor through the administration API of the ZeroKit backend.
      */
     public func createTresor(completion: @escaping TresorIdCompletion) {
-        callMethod("cmd.api.createTresor", parameters: []) { success, result in
+        self.internalApi.callMethod("cmd.api.createTresor", parameters: []) { success, result in
             if let tresorId = result as? String, success {
                 completion(tresorId, nil)
             } else {
@@ -657,7 +485,7 @@ public extension ZeroKit {
      - parameter completion: Called when the operation finishes, contains the operationId required to approve the operation.
      */
     public func share(tresorWithId tresorId: String, withUser userId: String, completion: @escaping OperationIdCompletion) {
-        callMethod("cmd.api.shareTresor", parameters: [tresorId, userId]) { success, result in
+        self.internalApi.callMethod("cmd.api.shareTresor", parameters: [tresorId, userId]) { success, result in
             if let opId = result as? String, success {
                 completion(opId, nil)
             } else {
@@ -674,7 +502,7 @@ public extension ZeroKit {
      - parameter completion: Called when the operation finishes, contains the operationId required to approve the operation.
      */
     public func kick(userWithId userId: String, fromTresor tresorId: String, completion: @escaping OperationIdCompletion) {
-        callMethod("cmd.api.kickFromTresor", parameters: [tresorId, userId]) { success, result in
+        self.internalApi.callMethod("cmd.api.kickFromTresor", parameters: [tresorId, userId]) { success, result in
             if let opId = result as? String, success {
                 completion(opId, nil)
             } else {
@@ -702,7 +530,7 @@ public extension ZeroKit {
      - parameter completion: Called when the operation finishes, contains the operationId required to approve the operation.
      */
     public func acceptInvitationLink(with token: String, password: String, completion: @escaping OperationIdCompletion) {
-        callMethod("ios_mobileCmd_acceptInvitationLink", parameters: [token, password]) { success, result in
+        self.internalApi.callMethod("ios_mobileCmd_acceptInvitationLink", parameters: [token, password]) { success, result in
             if let opId = result as? String, success {
                 completion(opId, nil)
             } else {
@@ -718,7 +546,7 @@ public extension ZeroKit {
      - parameter completion: Called when the operation finishes, contains the operationId required to approve the operation.
      */
     public func acceptInvitationLinkWithoutPassword(with token: String, completion: @escaping OperationIdCompletion) {
-        callMethod("ios_cmd_api_acceptInvitationLinkNoPassword", parameters: [token]) { success, result in
+        self.internalApi.callMethod("ios_cmd_api_acceptInvitationLinkNoPassword", parameters: [token]) { success, result in
             if let opId = result as? String, success {
                 completion(opId, nil)
             } else {
@@ -750,7 +578,7 @@ public extension ZeroKit {
      - parameter completion: contains the created link if successful
      */
     public func createInvitationLink(with linkBase: URL, forTresor tresorId: String, withMessage message: String, password: String, completion: @escaping InvitationLinkCompletion) {
-        callMethod("mobileCmd.createInvitationLink", parameters: [linkBase.absoluteString, tresorId, message, password]) { success, result in
+        self.internalApi.callMethod("mobileCmd.createInvitationLink", parameters: [linkBase.absoluteString, tresorId, message, password]) { success, result in
             if let link = InvitationLink(result: result), success {
                 completion(link, nil)
             } else {
@@ -768,7 +596,7 @@ public extension ZeroKit {
      - parameter completion: contains the created link if successful
      */
     public func createInvitationLinkWithoutPassword(with linkBase: URL, forTresor tresorId: String, withMessage message: String, completion: @escaping InvitationLinkCompletion) {
-        callMethod("cmd.api.createInvitationLinkNoPassword", parameters: [linkBase.absoluteString, tresorId, message]) { success, result in
+        self.internalApi.callMethod("cmd.api.createInvitationLinkNoPassword", parameters: [linkBase.absoluteString, tresorId, message]) { success, result in
             if let link = InvitationLink(result: result), success {
                 completion(link, nil)
             } else {
@@ -784,7 +612,7 @@ public extension ZeroKit {
      - parameter completion: Return information about the link when finishes.
      */
     public func getInvitationLinkInfo(with secret: String, completion: @escaping InvitationLinkInfoCompletion) {
-        callMethod("ios_cmd_api_getInvitationLinkInfo", parameters: [secret]) { success, result in
+        self.internalApi.callMethod("ios_cmd_api_getInvitationLinkInfo", parameters: [secret]) { success, result in
             if let linkInfo = InvitationLinkPublicInfo(result: result) , success {
                 completion(linkInfo, nil)
             } else {
@@ -792,4 +620,99 @@ public extension ZeroKit {
             }
         }
     }
+    
+    /**
+     Get authorization code and identity tokens for the currenty logged in user.
+     
+     You can set up Open ID clients on the ZeroKit management portal. The client used with the mobile SDK should have the following settings:
+     
+     - Redirect URL should have the following format: 'https://{Client ID}.{Tenant ID}.api.tresorit.io/'
+     - Flow should be set to 'Hybrid'
+     - You can optionally turn on 'Requires proof key (DHCE)'
+     
+     **User must be logged in when calling this method.**
+     
+     - parameter clientId: The cliend ID for the current ZeroKit OpenID Connect client set up in the management portal.
+     - parameter completion: Returns the identity tokens or an error if an error occurred.
+     */
+    public func getIdentityTokens(clientId: String, completion: @escaping IdentityTokensCompletion) {
+        if self.idpQuery == nil {
+            self.getIdentityTokensInner(clientId: clientId, useProofKey: false, completion: completion)
+        } else {
+            self.nextIdpCalls.append({ [weak self] (isCancelled) in
+                if isCancelled {
+                    completion(nil, ZeroKitError.userInterrupted.nserrorValue)
+                } else {
+                    self?.getIdentityTokensInner(clientId: clientId, useProofKey: false, completion: completion)
+                }
+            })
+        }
+    }
+    
+    private func getIdentityTokensInner(clientId: String, useProofKey: Bool, completion: @escaping IdentityTokensCompletion) {
+        var webViewHostView: UIView?
+        do {
+            webViewHostView = try ZeroKit.hostViewForWebView()
+        } catch {
+            completion(nil, error as NSError)
+            runNextIdpRequest()
+            return
+        }
+        
+        self.idpQuery = IdentityProvider(clientId: clientId,
+                                         config: self.config,
+                                         processPool: self.internalApi.processPool,
+                                         webviewHostView: webViewHostView!)
+        
+        self.idpQuery!.getIdentityTokens(useProofKey: useProofKey) { [weak self] (identityTokens, error) in
+            completion(identityTokens, error)
+            self?.idpQuery = nil
+            self?.runNextIdpRequest()
+        }
+    }
+    
+    private func runNextIdpRequest() {
+        if self.nextIdpCalls.count > 0 {
+            let next = self.nextIdpCalls.removeFirst()
+            next(false)
+        }
+    }
+    
+    private func cancelAllIdpRequests() {
+        while self.nextIdpCalls.count > 0 {
+            let next = self.nextIdpCalls.removeFirst()
+            next(true)
+        }
+        self.idpQuery?.cancelRequest()
+    }
+}
+
+// MARK: deprecated
+
+public extension ZeroKit {
+    
+    /**
+     `true` if the SDK was successfully loaded, `false` otherwise.
+     */
+    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
+    public var isLoaded: Bool {
+        get { return self.internalApi.isLoaded }
+    }
+    
+    // MARK: Notifications
+    
+    /**
+     `DidLoadNotification` notification is posted when the SDK is successfully loaded. `ZeroKit.isLoaded` is also set to `true`.
+     */
+    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
+    public static let DidLoadNotification = DidLoadNotificationInner
+    internal static let DidLoadNotificationInner = Notification.Name("ZeroKit.DidLoadNotification")
+    
+    /**
+     `DidFailLoadingNotification` notification is posted when loading the SDK fails. `ZeroKit.isLoaded` is `false` if it fails.
+     */
+    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
+    public static let DidFailLoadingNotification = DidFailLoadingNotificationInner
+    internal static let DidFailLoadingNotificationInner = Notification.Name("ZeroKit.DidFailLoadingNotification")
+    
 }

@@ -39,6 +39,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "ObjcCompatibilityTests/testGetIdentityToken">
+               </Test>
+               <Test
                   Identifier = "ObjcCompatibilityTests/testPasswordChangeRememberMe">
                </Test>
                <Test
