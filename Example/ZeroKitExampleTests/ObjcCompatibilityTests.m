@@ -5,8 +5,7 @@
 #define kExpectationDefaultTimeout 90
 
 @interface ObjcCompatibilityTests : XCTestCase
-@property (strong, nonatomic) ZeroKit *zeroKit;
-@property (strong, nonatomic) ExampleAppMock *mockApp;
+@property (strong, nonatomic) ZeroKitStack *zeroKitStack;
 @end
 
 @implementation ObjcCompatibilityTests
@@ -14,38 +13,52 @@
 - (void)setUp {
     [super setUp];
     [self resetZeroKit];
-    self.mockApp = [[ExampleAppMock alloc] init];
 }
 
 - (void)tearDown {
-    self.zeroKit = nil;
+    self.zeroKitStack = nil;
     [super tearDown];
 }
 
 - (void)resetZeroKit {
-    NSURL *apiBaseURL = [NSURL URLWithString:[NSBundle mainBundle].infoDictionary[@"ZeroKitAPIBaseURL"]];
-    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiBaseURL];
+    NSURL *configFile = [[NSBundle mainBundle] URLForResource:@"Config" withExtension:@"plist"];
+    NSDictionary *configDict = [NSDictionary dictionaryWithContentsOfURL:configFile];
+    
+    NSURL *apiURL = [NSURL URLWithString:configDict[@"ZeroKitAPIBaseURL"]];
+    NSString *clientID = configDict[@"ZeroKitClientId"];
+    NSURL *backendURL = [NSURL URLWithString:configDict[@"ZeroKitAppBackend"]];
+    
+    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiURL];
     
     NSError *error = nil;
-    self.zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
+    ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
     XCTAssertNil(error);
+    
+    Backend *backend = [[Backend alloc] initWithBackendBaseUrl:backendURL authorizationCallback:^(void (^credentialsCallback)(NSString * _Nullable, NSString * _Nullable, NSError * _Nullable)) {
+        [zeroKit getIdentityTokensWithClientId:clientID completion:^(ZeroKitIdentityTokens * _Nullable tokens, NSError * _Nullable error) {
+            credentialsCallback(tokens.authorizationCode, clientID, error);
+        }];
+    }];
+    
+    self.zeroKitStack = [[ZeroKitStack alloc] initWithZeroKit:zeroKit backend:backend];
 }
 
 #pragma mark - Convenience
 
 - (TestUser *)registerUser {
+    NSString * const username = [NSString stringWithFormat:@"test-user-%@", [NSUUID UUID].UUIDString];
+    NSString * const profileData = @"{ \"autoValidate\": true }"; // User is automatically validated by the server
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Init registration"];
     
     NSString * __block userId = nil;
     NSString * __block regSessionId = nil;
-    NSString * __block regSessionVerifier = nil;
     
-    [self.mockApp initUserRegistration:^(BOOL success, NSString * _Nullable aUserId, NSString * _Nullable aRegSessionId, NSString * _Nullable aRegSessionVerifier) {
-        XCTAssertTrue(success);
+    [self.zeroKitStack.backend initRegistrationWithUsername:username profileData:profileData completion:^(NSString * _Nullable aUserId, NSString * _Nullable aRegSessionId, NSError * _Nullable error) {
+        XCTAssertNil(error);
         
         userId = aUserId;
         regSessionId = aRegSessionId;
-        regSessionVerifier = aRegSessionVerifier;
         
         [expectation fulfill];
     }];
@@ -57,7 +70,7 @@
     NSString *__block regValidationVerifier = nil;
     NSString *password = @"Abc123";
     
-    [self.zeroKit registerWithUserId:userId registrationId:regSessionId password:password completion:^(NSString * _Nullable aRegValidationVerifier, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit registerWithUserId:userId registrationId:regSessionId password:password completion:^(NSString * _Nullable aRegValidationVerifier, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Registration failed %@", error);
             return;
@@ -72,16 +85,15 @@
     
     expectation = [self expectationWithDescription:@"User validation"];
     
-    
-    [self.mockApp validateUser:userId regSessionId:regSessionId regSessionVerifier:regSessionVerifier regValidationVerifier:regValidationVerifier completion:^(BOOL success) {
-        XCTAssertTrue(success);
-        NSLog(@"Reg validation: %d", success);
+    [self.zeroKitStack.backend finishRegistrationWithUserId:userId validationVerifier:regValidationVerifier completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        NSLog(@"Registration finished");
         [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
     
-    return [[TestUser alloc] initWithId:userId password:password];
+    return [[TestUser alloc] initWithId:userId username:username password:password];
 }
 
 - (void)loginUser:(TestUser *)user {
@@ -94,7 +106,7 @@
 
 - (void)loginUser:(TestUser *)user rememberMe:(BOOL)rememberMe expectErrorCode:(ZeroKitError)errorCode {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Login"];
-    [self.zeroKit loginWithUserId:user.id password:user.password rememberMe:rememberMe completion:^(NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit loginWithUserId:user.id password:user.password rememberMe:rememberMe completion:^(NSError * _Nullable error) {
         if (error) {
             XCTAssertTrue(errorCode == error.code, @"Login failed with unexpected error: %@", error);
         } else {
@@ -108,7 +120,7 @@
 - (void)loginByRememberMeWithUserId:(NSString *)userId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Login by remember me"];
     
-    [self.zeroKit loginByRememberMeWith:userId completion:^(NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit loginByRememberMeWith:userId completion:^(NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to log in by remember me: %@", error);
         }
@@ -121,7 +133,8 @@
 
 - (void)logout {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Logout"];
-    [self.zeroKit logoutWithCompletion:^(NSError * _Nullable error) {
+    [self.zeroKitStack.backend forgetToken];
+    [self.zeroKitStack.zeroKit logoutWithCompletion:^(NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Logout failed %@", error);
         }
@@ -134,7 +147,7 @@
 - (NSString *)whoAmI {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Who am I?"];
     NSString * __block userId = nil;
-    [self.zeroKit whoAmIWithCompletion:^(NSString * _Nullable aUserId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit whoAmIWithCompletion:^(NSString * _Nullable aUserId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Who am I failed: %@", error);
         }
@@ -149,13 +162,13 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Tresor creation"];
     NSString * __block tresorId = nil;
     
-    [self.zeroKit createTresorWithCompletion:^(NSString * _Nullable aTresorId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit createTresorWithCompletion:^(NSString * _Nullable aTresorId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Tresor creation failed: %@", error);
         }
         
-        [self.mockApp approveTresorCreation:aTresorId approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend createdTresorWithTresorId:aTresorId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             tresorId = aTresorId;
             [expectation fulfill];
         }];
@@ -171,7 +184,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Getting link info"];
     NSString *secret = link.url.fragment;
     
-    [self.zeroKit getInvitationLinkInfoWith:secret completion:^(InvitationLinkPublicInfo * _Nullable aInfo, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit getInvitationLinkInfoWith:secret completion:^(InvitationLinkPublicInfo * _Nullable aInfo, NSError * _Nullable error) {
         if (error) {
             XCTFail("Failed to get invitation link info: %@", error);
         }
@@ -188,7 +201,7 @@
 - (TestUser *)changePasswordForUser:(TestUser *)user newPassword:(NSString *)newPassword {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Changing password"];
     
-    [self.zeroKit changePasswordFor:user.id currentPassword:user.password newPassword:newPassword completion:^(NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit changePasswordFor:user.id currentPassword:user.password newPassword:newPassword completion:^(NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to change password: %@", error);
         }
@@ -198,7 +211,7 @@
     
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
     
-    return [[TestUser alloc] initWithId:user.id password:newPassword];
+    return [[TestUser alloc] initWithId:user.id username:user.username password:newPassword];
 }
 
 #pragma mark - Tests
@@ -214,13 +227,13 @@
 }
 
 - (void)testLoginWithInvalidUser {
-    TestUser *user = [[TestUser alloc] initWithId:@"InvalidUserID" password:@"Password"];
+    TestUser *user = [[TestUser alloc] initWithId:@"InvalidUserID" username:@"DoesNotMatter" password:@"Password"];
     [self loginUser:user rememberMe:NO expectErrorCode:ZeroKitErrorInvalidUserId];
 }
 
 - (void)testLoginWithInvalidPassword {
     TestUser *user = [self registerUser];
-    TestUser *invalidPwUser = [[TestUser alloc] initWithId:user.id password:@"Invalid password"];
+    TestUser *invalidPwUser = [[TestUser alloc] initWithId:user.id username:user.username password:@"Invalid password"];
     [self loginUser:invalidPwUser rememberMe:NO expectErrorCode:ZeroKitErrorInvalidAuthorization];
 }
 
@@ -290,12 +303,12 @@
     
     NSString *plainText = @"Encrypting this.";
     
-    [self.zeroKit encryptWithPlainText:plainText inTresor:tresorId completion:^(NSString * _Nullable cipherText, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit encryptWithPlainText:plainText inTresor:tresorId completion:^(NSString * _Nullable cipherText, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Text encryption failed: %@", error);
         }
         
-        [self.zeroKit decryptWithCipherText:cipherText completion:^(NSString * _Nullable aPlainText, NSError * _Nullable error) {
+        [self.zeroKitStack.zeroKit decryptWithCipherText:cipherText completion:^(NSString * _Nullable aPlainText, NSError * _Nullable error) {
             if (error) {
                 XCTFail(@"Text decryption failed: %@", error);
             }
@@ -317,12 +330,12 @@
     
     NSData *plainData = [@"Encrypting this." dataUsingEncoding:NSUTF8StringEncoding];
     
-    [self.zeroKit encryptWithPlainData:plainData inTresor:tresorId completion:^(NSData * _Nullable cipherData, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit encryptWithPlainData:plainData inTresor:tresorId completion:^(NSData * _Nullable cipherData, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Data encryption failed: %@", error);
         }
         
-        [self.zeroKit decryptWithCipherData:cipherData completion:^(NSData * _Nullable aPlainData, NSError * _Nullable error) {
+        [self.zeroKitStack.zeroKit decryptWithCipherData:cipherData completion:^(NSData * _Nullable aPlainData, NSError * _Nullable error) {
             if (error) {
                 XCTFail(@"Data decryption failed: %@", error);
             }
@@ -345,13 +358,13 @@
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Tresor sharing"];
     
-    [self.zeroKit shareWithTresorWithId:tresorId withUser:invitee.id completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit shareWithTresorWithId:tresorId withUser:invitee.id completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Tresor sharing failed: %@", error);
         }
         
-        [self.mockApp approveShare:operationId approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend sharedTresorWithOperationId:operationId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             [expectation fulfill];
         }];
     }];
@@ -360,13 +373,13 @@
     
     expectation = [self expectationWithDescription:@"Kicking user"];
     
-    [self.zeroKit kickWithUserWithId:invitee.id fromTresor:tresorId completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit kickWithUserWithId:invitee.id fromTresor:tresorId completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Kicking user failed: %@", error);
         }
         
-        [self.mockApp approveKick:operationId approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend kickedUserWithOperationId:operationId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             [expectation fulfill];
         }];
     }];
@@ -389,13 +402,13 @@
     
     InvitationLink * __block link = nil;
     
-    [self.zeroKit createInvitationLinkWithoutPasswordWith:baseUrl forTresor:tresorId withMessage:message completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit createInvitationLinkWithoutPasswordWith:baseUrl forTresor:tresorId withMessage:message completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to create invitation link without password: %@", error);
         }
         
-        [self.mockApp approveCreateInvitationLink:aLink.id approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend createdInvitationLinkWithOperationId:aLink.id completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             link = aLink;
             [expectation fulfill];
         }];
@@ -415,13 +428,13 @@
 
     expectation = [self expectationWithDescription:@"Accepting link without password"];
     
-    [self.zeroKit acceptInvitationLinkWithoutPasswordWith:info.token completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit acceptInvitationLinkWithoutPasswordWith:info.token completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to accept invitation link without password: %@", error);
         }
         
-        [self.mockApp approveAcceptInvitationLink:operationId approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend acceptedInvitationLinkWithOperationId:operationId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             [expectation fulfill];
         }];
     }];
@@ -445,13 +458,13 @@
     
     InvitationLink * __block link = nil;
     
-    [self.zeroKit createInvitationLinkWith:baseUrl forTresor:tresorId withMessage:message password:password completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit createInvitationLinkWith:baseUrl forTresor:tresorId withMessage:message password:password completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to create invitation link without password: %@", error);
         }
         
-        [self.mockApp approveCreateInvitationLink:aLink.id approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend createdInvitationLinkWithOperationId:aLink.id completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             link = aLink;
             [expectation fulfill];
         }];
@@ -471,13 +484,13 @@
     
     expectation = [self expectationWithDescription:@"Accepting link without password"];
     
-    [self.zeroKit acceptInvitationLinkWith:info.token password:password completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit acceptInvitationLinkWith:info.token password:password completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
         if (error) {
             XCTFail(@"Failed to accept invitation link without password: %@", error);
         }
         
-        [self.mockApp approveAcceptInvitationLink:operationId approve:YES completion:^(BOOL success) {
-            XCTAssertTrue(success);
+        [self.zeroKitStack.backend acceptedInvitationLinkWithOperationId:operationId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             [expectation fulfill];
         }];
     }];
@@ -490,7 +503,7 @@
     
     PasswordStrength *__block s = nil;
     
-    [self.zeroKit passwordStrengthWithPassword:@"vkntF2e@FBW7" completion:^(PasswordStrength * _Nullable strength, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit passwordStrengthWithPassword:@"vkntF2e@FBW7" completion:^(PasswordStrength * _Nullable strength, NSError * _Nullable error) {
         XCTAssertNil(error);
         s = strength;
         [expectation fulfill];
@@ -508,7 +521,7 @@
     NSString *clientId = @"{Put your client ID here}";
     XCTestExpectation *expectation = [self expectationWithDescription:@"IDP test"];
     
-    [self.zeroKit getIdentityTokensWithClientId:clientId completion:^(ZeroKitIdentityTokens * _Nullable tokens, NSError * _Nullable error) {
+    [self.zeroKitStack.zeroKit getIdentityTokensWithClientId:clientId completion:^(ZeroKitIdentityTokens * _Nullable tokens, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(tokens);
         [expectation fulfill];

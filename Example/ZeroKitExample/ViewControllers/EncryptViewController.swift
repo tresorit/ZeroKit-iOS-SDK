@@ -74,12 +74,11 @@ class EncryptViewController: UIViewController {
                 return
             }
             
-            /// 2. Tresor creation must be approved by the admin. You should send the tresor ID to your backend to approve its creation.
-            AppDelegate.current.mockApp?.approveTresorCreation(tresorId!, approve: true) { (success) -> (Void) in
+            /// 2. Tresor creation must be approved by an administrative call. You should send the tresor ID to your backend to approve its creation.
+            AppDelegate.current.backend?.createdTresor(tresorId: tresorId!) { error in
                 AppDelegate.current.hideProgress()
-                if success {
-                    self.saveTresor(tresorId!)
-                    self.didSelectTresor(tresorId!)
+                if error == nil {
+                    self.useTresor(tresorId!)
                 } else {
                     self.showAlert("Error approving tresor creation")
                 }
@@ -87,36 +86,7 @@ class EncryptViewController: UIViewController {
         }
     }
     
-    @IBAction func selectTresorButtonTap(_ sender: AnyObject) {
-        AppDelegate.current.zeroKit?.whoAmI { userId, error in
-            guard let userId = userId else {
-                return
-            }
-            
-            /// The tresors of the user cannot be queried from ZeroKit. Your app must save the tresor IDs and later make these accessible.
-            if let tresors = AppDelegate.current.mockApp?.db.tresorsForUser(userId) {
-                let actionSheet = UIAlertController(title: "Select Tresor", message: nil, preferredStyle: .actionSheet)
-                for tresor in tresors {
-                    actionSheet.addAction(UIAlertAction(title: tresor, style: .default) { action in
-                        self.didSelectTresor(tresor)
-                        })
-                }
-                actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                self.present(actionSheet, animated: true, completion: nil)
-            }
-        }
-    }
-    
-    fileprivate func saveTresor(_ tresorId: String) {
-        /// Your application must persist the tresor IDs as they cannot be queried via the ZeroKit SDK.
-        AppDelegate.current.zeroKit?.whoAmI { userId, error in
-            if let userId = userId {
-                AppDelegate.current.mockApp?.db.addTresor(tresorId, forUser: userId)
-            }
-        }
-    }
-    
-    fileprivate func didSelectTresor(_ tresorId: String) {
+    private func useTresor(_ tresorId: String) {
         self.tresorId = tresorId
         self.tresorIdLabel.text = "Tresor ID: \(tresorId)"
         enableStep(encryptTextStepView)
@@ -197,10 +167,8 @@ class EncryptViewController: UIViewController {
     @IBAction func shareButtonTap(_ sender: AnyObject) {
         self.view.endEditing(true)
         
-        /// 1. Get the user ID for the specified username.
-        guard let username = self.usernameTextField.text,
-            let userId = AppDelegate.current.mockApp?.db.userIdForUsername(username) else {
-            self.showAlert("Cannot find user ID for the specified username")
+        guard let username = self.usernameTextField.text, username.characters.count > 0 else {
+            self.showAlert("Username cannot be empty")
             return
         }
         
@@ -208,21 +176,30 @@ class EncryptViewController: UIViewController {
         
         AppDelegate.current.showProgress()
         
-        /// 2. Share the selected tresor with the specified user ID
-        AppDelegate.current.zeroKit?.share(tresorWithId: self.tresorId, withUser: userId) { operationId, error in
-            guard error == nil else {
+        /// 1. Get the user ID for the specified username.
+        AppDelegate.current.backend?.getUserId(forUsername: username) { userId, error in
+            guard let userId = userId, error == nil else {
                 AppDelegate.current.hideProgress()
-                self.showAlert("Error sharing tresor", message: "\(error!)")
+                self.showAlert("Error fetching user ID for username", message: "\(error!)")
                 return
             }
             
-            /// 3. Tresor sharing must be approved by the admin. You should send the operation ID of to your applications backend.
-            AppDelegate.current.mockApp?.approveShare(operationId!, approve: true) { (success) -> (Void) in
-                AppDelegate.current.hideProgress()
-                if success {
-                    self.shareResultLabel.text = "Shared"
-                } else {
-                    self.showAlert("Error approving tresor share")
+            /// 2. Share the selected tresor with the specified user ID
+            AppDelegate.current.zeroKit?.share(tresorWithId: self.tresorId, withUser: userId) { operationId, error in
+                guard error == nil else {
+                    AppDelegate.current.hideProgress()
+                    self.showAlert("Error sharing tresor", message: "\(error!)")
+                    return
+                }
+                
+                /// 3. Tresor sharing must be approved via the administrative API. You should send the operation ID to your application backend to handle approval.
+                AppDelegate.current.backend?.sharedTresor(operationId: operationId!) { error in
+                    AppDelegate.current.hideProgress()
+                    if error == nil {
+                        self.shareResultLabel.text = "Shared"
+                    } else {
+                        self.showAlert("Error approving tresor share")
+                    }
                 }
             }
         }

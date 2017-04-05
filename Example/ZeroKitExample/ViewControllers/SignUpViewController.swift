@@ -89,42 +89,50 @@ class SignUpViewController: UIViewController, ZeroKitPasswordFieldDelegate {
         }
         
         /*
-         3-step user registration:
-         1. init registration
-         2. register user through the SDK
-         3. validate the user
+         User registration:
+         1. Init registration via the backend that uses the admin API.
+         2. Register user through the SDK.
+         3. Finish the registration calling the backend.
+         4. The registration has to be validated using the validation code that is not returned by the backend. The server should send a verfication email to the user or validate through some other method.
         */
         
         AppDelegate.current.showProgress()
         
-        /// Registering a user is a 3-step process:
+        /// Auto validate, so step 4 is automatically taken care of by the server.
+        /// This applies to users whose username is in the format "test-user-{xyz}".
+        let demoProfileData = "{ \"autoValidate\": true }"
         
-        /// 1. You must initialize a user registration with the admin. You should send a request to your application's backend to do this.
-        AppDelegate.current.mockApp?.initUserRegistration { (success, userId, regSessionId, regSessionVerifier) -> (Void) in
-            guard success else {
-                self.showAlert("Error initializing user registration")
+        /// Step 1. You must initialize a user registration with an administrative call. You should ask your application backend to initialize the registration.
+        AppDelegate.current.backend?.initRegistration(username: username, profileData: demoProfileData) { userId, regSessionId, error in
+            
+            guard error == nil else {
+                self.showAlert("Error initializing user registration", message: "\(error!)")
                 AppDelegate.current.hideProgress()
                 return
             }
             
-            /// 2. You register the user with their password via ZeroKit.
-            AppDelegate.current.zeroKit?.register(withUserId: userId!, registrationId: regSessionId!, passwordField: self.passwordTextField) { regValidationVerifier, error in
+            /// Step 2. You register the user with their chosen password via ZeroKit, using the user ID received from the initRegistration call.
+            AppDelegate.current.zeroKit!.register(withUserId: userId!, registrationId: regSessionId!, passwordField: self.passwordTextField) { regValidationVerifier, error in
+                
                 guard error == nil else {
                     AppDelegate.current.hideProgress()
                     self.showAlert("Sign up error", message: "\(error!)")
                     return
                 }
-                
-                /// 3. Once the user is registered they must be validated with an admin call made by your backend.
-                AppDelegate.current.mockApp?.validateUser(userId!, regSessionId: regSessionId!, regSessionVerifier: regSessionVerifier!, regValidationVerifier: regValidationVerifier!) { (success) -> (Void) in
+
+                /// Step 3. Once the user is registered the registration validation verifier must be returned to the backend. It will be used to validate the user registration.
+                AppDelegate.current.backend?.finishRegistration(userId: userId!, validationVerifier: regValidationVerifier!) { error in
                     
                     AppDelegate.current.hideProgress()
-                    if success {
-                        AppDelegate.current.mockApp?.db.saveUserId(userId!, forUsername: username)
-                        self.showAlert("Successfully registered user \(username). You can now sign in.")
-                    } else {
-                        self.showAlert("Error validating user after registration")
+                    
+                    guard error == nil else {
+                        self.showAlert("Error initializing user registration", message: "\(error!)")
+                        return
                     }
+                    
+                    self.showAlert("Successfully registered user \(username). You can now sign in.")
+                    
+                    /// Step 4. User validation is handled by the backend.
                 }
             }
         }

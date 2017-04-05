@@ -41,6 +41,5 @@ playground.xcworkspace
 Carthage/Build
 
 # ZeroKit
-ExampleAppMock.plist
-Example/ZeroKitExample/Info.plist
+Example/ZeroKitExample/Config.plist
 

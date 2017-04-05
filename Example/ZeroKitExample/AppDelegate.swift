@@ -6,7 +6,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var zeroKit: ZeroKit?
-    var mockApp: ExampleAppMock?
+    var backend: Backend?
     
     static var current: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
@@ -15,19 +15,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.tintColor = UIColor(red: 3/255.0, green: 173/255.0, blue: 211/255.0, alpha: 1.0)
-        window?.rootViewController = UIViewController()
-        window?.rootViewController!.view.backgroundColor = UIColor.white
+        showSigninScreen()
         window?.makeKeyAndVisible()
         
-        mockApp = ExampleAppMock()
-        
-        let apiBaseUrl = URL(string: Bundle.main.infoDictionary!["ZeroKitAPIBaseURL"] as! String)!
-        let zeroKitConfig = ZeroKitConfig(apiBaseUrl: apiBaseUrl)
-        zeroKit = try! ZeroKit(config: zeroKitConfig)
-        
-        showSigninScreen()
+        zeroKitInit()
         
         return true
+    }
+    
+    private func zeroKitInit() {
+        let configFile = Bundle.main.url(forResource: "Config", withExtension: "plist")!
+        let configDict = NSDictionary(contentsOf: configFile)!
+        
+        let clientId = configDict["ZeroKitClientId"] as! String
+        let apiUrl = URL(string: configDict["ZeroKitAPIBaseURL"] as! String)!
+        let backendUrl = URL(string: configDict["ZeroKitAppBackend"] as! String)!
+        
+        let config = ZeroKitConfig(apiBaseUrl: apiUrl)
+        zeroKit = try! ZeroKit(config: config)
+        
+        backend = Backend(withBackendBaseUrl: backendUrl, authorizationCallback: { [weak self] credentialsCallback in
+            self?.zeroKit?.getIdentityTokens(clientId: clientId) { tokens, error in
+                credentialsCallback(tokens?.authorizationCode, clientId, error)
+            }
+        })
     }
     
     func showSigninScreen() {

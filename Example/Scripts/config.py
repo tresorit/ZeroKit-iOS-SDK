@@ -4,20 +4,15 @@ import shutil
 import os
 import argparse
 
-def prepareSource(baseUrl, tenantId, adminKey):
+def prepareSource(baseUrl, clientId, appBackendUrl):
 	baseUrl = baseUrl.rstrip("/")
 	
 	scriptDir = os.path.dirname(os.path.realpath(__file__))
 
 	configFiles = []
 
-	src = os.path.join(scriptDir, '../ZeroKitExample/Info.sample.plist')
-	dst = os.path.join(scriptDir, '../ZeroKitExample/Info.plist')
-	shutil.copyfile(src, dst)
-	configFiles.append(dst)
-
-	src = os.path.join(scriptDir, '../ZeroKitExample/ExampleAppMock/ExampleAppMock.sample.plist')
-	dst = os.path.join(scriptDir, '../ZeroKitExample/ExampleAppMock/ExampleAppMock.plist')
+	src = os.path.join(scriptDir, '../ZeroKitExample/Config.sample.plist')
+	dst = os.path.join(scriptDir, '../ZeroKitExample/Config.plist')
 	shutil.copyfile(src, dst)
 	configFiles.append(dst)
 
@@ -27,8 +22,8 @@ def prepareSource(baseUrl, tenantId, adminKey):
 			filedata = file.read()
 
 		filedata = filedata.replace('{TenantBaseUrl}', baseUrl)
-		filedata = filedata.replace('{TenantId}', tenantId)
-		filedata = filedata.replace('{AdminKey}', adminKey)
+		filedata = filedata.replace('{ClientId}', clientId)
+		filedata = filedata.replace('{AppBackendUrl}', appBackendUrl)
 
 		with open(filepath, 'w') as file:
 			file.write(filedata)
@@ -38,10 +33,10 @@ def prepareSource(baseUrl, tenantId, adminKey):
 def argParser():
 	parser = argparse.ArgumentParser(description='Configure ZeroKit example app')
 	parser.add_argument('-b', '--baseurl', help='Your API base URL.', required=True)
-	parser.add_argument('-t', '--tenantid', help='Your tenant ID.', required=True)
-	parser.add_argument('-a', '--adminkey', help='Your admin key.', required=True)
+	parser.add_argument('-c', '--clientid', help='Your mobile app client ID.', required=True)
+	parser.add_argument('-a', '--appbackendurl', help='Your application backend URL.', required=True)
 	return parser
 
 if __name__ == '__main__':
 	args = argParser().parse_args()
-	prepareSource(args.baseurl, args.tenantid, args.adminkey)
+	prepareSource(args.baseurl, args.clientid, args.appbackendurl)

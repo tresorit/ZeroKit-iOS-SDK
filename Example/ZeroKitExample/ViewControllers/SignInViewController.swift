@@ -14,22 +14,26 @@ class SignInViewController: UIViewController {
             return
         }
         
-        guard let userId = AppDelegate.current.mockApp!.db.userIdForUsername(username) else {
-            self.showAlert("User not registered")
-            return
-        }
-        
         AppDelegate.current.showProgress()
         
-        AppDelegate.current.zeroKit?.login(withUserId: userId, passwordField: passwordTextField, rememberMe: false) { error in
-            AppDelegate.current.hideProgress()
+        AppDelegate.current.backend?.getUserId(forUsername: username) { userId, error in
             
             guard error == nil else {
-                self.showAlert("Sign in error", message: "\(error!)")
+                self.showAlert("Error getting user ID", message: "\(error!)")
+                AppDelegate.current.hideProgress()
                 return
             }
             
-            AppDelegate.current.showAfterSigninScreen()
+            AppDelegate.current.zeroKit?.login(withUserId: userId!, passwordField: self.passwordTextField, rememberMe: false) { error in
+                AppDelegate.current.hideProgress()
+                
+                guard error == nil else {
+                    self.showAlert("Sign in error", message: "\(error!)")
+                    return
+                }
+                
+                AppDelegate.current.showAfterSigninScreen()
+            }
         }
     }
     

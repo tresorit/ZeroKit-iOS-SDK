@@ -46,7 +46,7 @@ public class PasswordCrackTimes: NSObject {
 }
 
 /**
- It shows the length, the strength of the passwords and gives estimates of time number of guesses and time required to crack the password. We calculate this by running zxcvbn (https://github.com/dropbox/zxcvbn).
+ It shows the length and the strength of the passwords, gives estimates of the number of guesses and time required to crack the password. We calculate this by running zxcvbn (https://github.com/dropbox/zxcvbn).
  */
 public class PasswordStrength: NSObject {
     

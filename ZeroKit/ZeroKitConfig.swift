@@ -23,9 +23,9 @@ public class ZeroKitConfig: NSObject, NSCopying {
     public var keychainAccessibility: CFString
     
     /**
-     Initialize a configuration with the API base URL. The URL is your tenant's URL.
+     Initialize a configuration with your service URL. The URL is your tenant's URL.
      
-     - parameter apiBaseUrl: Base URL for the API
+     - parameter apiBaseUrl: Your service URL. You can find it on the ZeroKit management portal.
      */
     public init(apiBaseUrl: URL) {
         self.apiBaseUrl = apiBaseUrl

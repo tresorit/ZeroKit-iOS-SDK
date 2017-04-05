@@ -14,22 +14,22 @@
 		E765BAE91D87EEDD00C0E556 /* DecryptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E765BAE81D87EEDD00C0E556 /* DecryptViewController.swift */; };
 		E765BAEB1D87F4FD00C0E556 /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E765BAEA1D87F4FD00C0E556 /* UIViewExtension.swift */; };
 		E765BAED1D88109A00C0E556 /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E765BAEC1D88109A00C0E556 /* AccountViewController.swift */; };
-		E768EA4F1E07D68F00DDE97F /* ObjcCompatibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E768EA4E1E07D68F00DDE97F /* ObjcCompatibilityTests.m */; };
+		E775E8251E6FFC0900201854 /* ZeroKitStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775E8241E6FFC0900201854 /* ZeroKitStack.swift */; };
 		E7808FB91D76E9670061FEB4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7808FB81D76E9670061FEB4 /* AppDelegate.swift */; };
 		E7808FBE1D76E9670061FEB4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7808FBC1D76E9670061FEB4 /* Main.storyboard */; };
 		E7808FC01D76E9670061FEB4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7808FBF1D76E9670061FEB4 /* Assets.xcassets */; };
 		E7808FC31D76E9670061FEB4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7808FC11D76E9670061FEB4 /* LaunchScreen.storyboard */; };
 		E7895D3E1D86C50700488EE8 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7895D3D1D86C50700488EE8 /* SignUpViewController.swift */; };
 		E7895D401D86C5C000488EE8 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7895D3F1D86C5C000488EE8 /* SignInViewController.swift */; };
-		E7895D421D86CB4B00488EE8 /* ExampleAppMockDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7895D411D86CB4B00488EE8 /* ExampleAppMockDatabase.swift */; };
 		E7895D441D86D4E500488EE8 /* EncryptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7895D431D86D4E500488EE8 /* EncryptViewController.swift */; };
-		E7992CC51D79B033006086CD /* ExampleAppMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7992CC41D79B033006086CD /* ExampleAppMock.swift */; };
-		E7A599C61D93D79B0035DB13 /* ZeroKitExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A599C51D93D79B0035DB13 /* ZeroKitExampleTests.swift */; };
-		E7A599CD1D93D8ED0035DB13 /* ExampleAppMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7992CC41D79B033006086CD /* ExampleAppMock.swift */; };
-		E7A599D11D93E9720035DB13 /* ExampleAppMock.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7A599D01D93E9720035DB13 /* ExampleAppMock.plist */; };
-		E7A599D21D93EC4F0035DB13 /* ExampleAppMock.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7A599D01D93E9720035DB13 /* ExampleAppMock.plist */; };
-		E7A599D31D93EDDF0035DB13 /* ExampleAppMockDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7895D411D86CB4B00488EE8 /* ExampleAppMockDatabase.swift */; };
+		E7A599C61D93D79B0035DB13 /* ZeroKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A599C51D93D79B0035DB13 /* ZeroKitTests.swift */; };
 		E7A599D61D9403B30035DB13 /* TestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A599D51D9403B30035DB13 /* TestUser.swift */; };
+		E7ED06461E644FF600404646 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ED06451E644FF600404646 /* Backend.swift */; };
+		E7ED06471E644FF600404646 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ED06451E644FF600404646 /* Backend.swift */; };
+		E7FB2A361E7012A200920D51 /* ObjcCompatibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E768EA4E1E07D68F00DDE97F /* ObjcCompatibilityTests.m */; };
+		E7FB2A391E70302B00920D51 /* BackendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FB2A381E70302B00920D51 /* BackendTests.swift */; };
+		E7FB2A3B1E70306700920D51 /* ZeroKitTestCaseBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FB2A3A1E70306700920D51 /* ZeroKitTestCaseBase.swift */; };
+		E7FBD6061E680964003F6EB1 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = E7FBD6051E680964003F6EB1 /* Config.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +78,7 @@
 		E765BAEA1D87F4FD00C0E556 /* UIViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
 		E765BAEC1D88109A00C0E556 /* AccountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		E768EA4E1E07D68F00DDE97F /* ObjcCompatibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjcCompatibilityTests.m; sourceTree = "<group>"; };
+		E775E8241E6FFC0900201854 /* ZeroKitStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitStack.swift; sourceTree = "<group>"; };
 		E7808FB51D76E9660061FEB4 /* ZeroKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZeroKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7808FB81D76E9670061FEB4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E7808FBD1D76E9670061FEB4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -86,16 +87,15 @@
 		E7808FC41D76E9670061FEB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E7895D3D1D86C50700488EE8 /* SignUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		E7895D3F1D86C5C000488EE8 /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
-		E7895D411D86CB4B00488EE8 /* ExampleAppMockDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleAppMockDatabase.swift; sourceTree = "<group>"; };
 		E7895D431D86D4E500488EE8 /* EncryptViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptViewController.swift; sourceTree = "<group>"; };
-		E7992CC41D79B033006086CD /* ExampleAppMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleAppMock.swift; sourceTree = "<group>"; };
-		E7992CC61D79BD10006086CD /* ZeroKitExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZeroKitExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		E7A599C31D93D79B0035DB13 /* ZeroKitExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroKitExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E7A599C51D93D79B0035DB13 /* ZeroKitExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZeroKitExampleTests.swift; sourceTree = "<group>"; };
+		E7A599C51D93D79B0035DB13 /* ZeroKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZeroKitTests.swift; sourceTree = "<group>"; };
 		E7A599C71D93D79B0035DB13 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E7A599D01D93E9720035DB13 /* ExampleAppMock.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ExampleAppMock.plist; sourceTree = "<group>"; };
-		E7A599D41D93EE190035DB13 /* ZeroKitExampleTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ZeroKitExampleTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E7A599D51D9403B30035DB13 /* TestUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestUser.swift; sourceTree = "<group>"; };
+		E7ED06451E644FF600404646 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
+		E7FB2A381E70302B00920D51 /* BackendTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendTests.swift; sourceTree = "<group>"; };
+		E7FB2A3A1E70306700920D51 /* ZeroKitTestCaseBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitTestCaseBase.swift; sourceTree = "<group>"; };
+		E7FBD6051E680964003F6EB1 /* Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,15 +156,15 @@
 		E7808FB71D76E9670061FEB4 /* ZeroKitExample */ = {
 			isa = PBXGroup;
 			children = (
+				E7ED06401E644ED200404646 /* Backend */,
 				E765BAE31D87D51400C0E556 /* Views */,
 				E7895D3C1D86C4DF00488EE8 /* ViewControllers */,
-				E7992CC31D79B012006086CD /* ExampleAppMock */,
 				E7808FB81D76E9670061FEB4 /* AppDelegate.swift */,
 				E7808FBC1D76E9670061FEB4 /* Main.storyboard */,
 				E7808FBF1D76E9670061FEB4 /* Assets.xcassets */,
 				E7808FC11D76E9670061FEB4 /* LaunchScreen.storyboard */,
-				E7992CC61D79BD10006086CD /* ZeroKitExample-Bridging-Header.h */,
 				E7808FC41D76E9670061FEB4 /* Info.plist */,
+				E7FBD6051E680964003F6EB1 /* Config.plist */,
 			);
 			path = ZeroKitExample;
 			sourceTree = "<group>";
@@ -182,26 +182,34 @@
 			path = ViewControllers;
 			sourceTree = "<group>";
 		};
-		E7992CC31D79B012006086CD /* ExampleAppMock */ = {
-			isa = PBXGroup;
-			children = (
-				E7992CC41D79B033006086CD /* ExampleAppMock.swift */,
-				E7895D411D86CB4B00488EE8 /* ExampleAppMockDatabase.swift */,
-				E7A599D01D93E9720035DB13 /* ExampleAppMock.plist */,
-			);
-			path = ExampleAppMock;
-			sourceTree = "<group>";
-		};
 		E7A599C41D93D79B0035DB13 /* ZeroKitExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E7A599D51D9403B30035DB13 /* TestUser.swift */,
-				E7A599C51D93D79B0035DB13 /* ZeroKitExampleTests.swift */,
+				E7FB2A371E702F6400920D51 /* Utils */,
+				E7A599C51D93D79B0035DB13 /* ZeroKitTests.swift */,
 				E768EA4E1E07D68F00DDE97F /* ObjcCompatibilityTests.m */,
-				E7A599D41D93EE190035DB13 /* ZeroKitExampleTests-Bridging-Header.h */,
+				E7FB2A381E70302B00920D51 /* BackendTests.swift */,
 				E7A599C71D93D79B0035DB13 /* Info.plist */,
 			);
 			path = ZeroKitExampleTests;
+			sourceTree = "<group>";
+		};
+		E7ED06401E644ED200404646 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				E7ED06451E644FF600404646 /* Backend.swift */,
+			);
+			path = Backend;
+			sourceTree = "<group>";
+		};
+		E7FB2A371E702F6400920D51 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E7A599D51D9403B30035DB13 /* TestUser.swift */,
+				E775E8241E6FFC0900201854 /* ZeroKitStack.swift */,
+				E7FB2A3A1E70306700920D51 /* ZeroKitTestCaseBase.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -308,8 +316,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7FBD6061E680964003F6EB1 /* Config.plist in Resources */,
 				E7808FC31D76E9670061FEB4 /* LaunchScreen.storyboard in Resources */,
-				E7A599D11D93E9720035DB13 /* ExampleAppMock.plist in Resources */,
 				E7808FC01D76E9670061FEB4 /* Assets.xcassets in Resources */,
 				E7808FBE1D76E9670061FEB4 /* Main.storyboard in Resources */,
 			);
@@ -319,7 +327,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7A599D21D93EC4F0035DB13 /* ExampleAppMock.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,10 +344,9 @@
 				E7895D401D86C5C000488EE8 /* SignInViewController.swift in Sources */,
 				E765BAEB1D87F4FD00C0E556 /* UIViewExtension.swift in Sources */,
 				E765BAE91D87EEDD00C0E556 /* DecryptViewController.swift in Sources */,
-				E7992CC51D79B033006086CD /* ExampleAppMock.swift in Sources */,
+				E7ED06461E644FF600404646 /* Backend.swift in Sources */,
 				E7808FB91D76E9670061FEB4 /* AppDelegate.swift in Sources */,
 				E7895D3E1D86C50700488EE8 /* SignUpViewController.swift in Sources */,
-				E7895D421D86CB4B00488EE8 /* ExampleAppMockDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,11 +354,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7A599CD1D93D8ED0035DB13 /* ExampleAppMock.swift in Sources */,
-				E7A599C61D93D79B0035DB13 /* ZeroKitExampleTests.swift in Sources */,
+				E775E8251E6FFC0900201854 /* ZeroKitStack.swift in Sources */,
+				E7FB2A3B1E70306700920D51 /* ZeroKitTestCaseBase.swift in Sources */,
+				E7A599C61D93D79B0035DB13 /* ZeroKitTests.swift in Sources */,
+				E7ED06471E644FF600404646 /* Backend.swift in Sources */,
 				E7A599D61D9403B30035DB13 /* TestUser.swift in Sources */,
-				E768EA4F1E07D68F00DDE97F /* ObjcCompatibilityTests.m in Sources */,
-				E7A599D31D93EDDF0035DB13 /* ExampleAppMockDatabase.swift in Sources */,
+				E7FB2A391E70302B00920D51 /* BackendTests.swift in Sources */,
+				E7FB2A361E7012A200920D51 /* ObjcCompatibilityTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -485,6 +493,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 986R6FFN66;
 				INFOPLIST_FILE = ZeroKitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -492,7 +501,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "98882ef8-2efe-44dd-87cd-4db6e302c1a1";
 				PROVISIONING_PROFILE_SPECIFIER = "Tresorit Development Wildcard";
-				SWIFT_OBJC_BRIDGING_HEADER = "ZeroKitExample/ZeroKitExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
@@ -504,12 +512,12 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ZeroKitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tresorit.ZeroKitExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "ZeroKitExample/ZeroKitExample-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -521,12 +529,12 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEFINES_MODULE = YES;
 				INFOPLIST_FILE = ZeroKitExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tresorit.ZeroKitExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = "ZeroKitExampleTests/ZeroKitExampleTests-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZeroKitExample.app/ZeroKitExample";
 			};
@@ -539,11 +547,11 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEFINES_MODULE = YES;
 				INFOPLIST_FILE = ZeroKitExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tresorit.ZeroKitExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "ZeroKitExampleTests/ZeroKitExampleTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZeroKitExample.app/ZeroKitExample";

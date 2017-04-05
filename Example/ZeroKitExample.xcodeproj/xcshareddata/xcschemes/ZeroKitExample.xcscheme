@@ -39,6 +39,12 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "ObjcCompatibilityTests/testInvitationLink">
+               </Test>
+               <Test
+                  Identifier = "ObjcCompatibilityTests/testInvitationLinkNoPassword">
+               </Test>
+               <Test
                   Identifier = "ObjcCompatibilityTests/testGetIdentityToken">
                </Test>
                <Test
@@ -52,6 +58,18 @@
                </Test>
                <Test
                   Identifier = "ZeroKitExampleTests/testRememberMe()">
+               </Test>
+               <Test
+                  Identifier = "ZeroKitTests/testInvitationLink()">
+               </Test>
+               <Test
+                  Identifier = "ZeroKitTests/testInvitationLinkNoPassword()">
+               </Test>
+               <Test
+                  Identifier = "ZeroKitTests/testPasswordChangeRememberMe()">
+               </Test>
+               <Test
+                  Identifier = "ZeroKitTests/testRememberMe()">
                </Test>
             </SkippedTests>
          </TestableReference>

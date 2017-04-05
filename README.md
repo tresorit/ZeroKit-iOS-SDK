@@ -132,6 +132,12 @@ ZeroKit comes with OpenID Connect provider implementation that you can use in yo
 
 You can add new clients and edit settings on the management portal.
 
+## Administrative API
+
+Most of the cryptographic operations (including invites and sharing) must be done client side by the SDK library. To provide control over these operations, and to prevent possible abuse by tampering the client, we introduced the admin API. All client initiated changes which has a permanent effect on the server has to be approved through the Admin API (typically by the server backend of the integrated app). For more information see the ZeroKit [documentation](https://tresorit.com/files/zerokit_encryption-sdk-documentation.pdf).
+
+**IMPORTANT:** You must **never include your Admin key in your client application**. We provide a sample backend to handle the administrative calls for our sample app. The admin key must be kept secret and not included in any client applications that you distribute.
+
 ## Example Application
 
 An example appliction is included with ZeroKit to demonstrate its usage. Open the `ZeroKit.xcworkspace` workspace which contains a `ZeroKitExample` project. It demonstrates the following features:
@@ -145,31 +151,30 @@ An example appliction is included with ZeroKit to demonstrate its usage. Open th
 
 ### Configuring the Example
 
-To use the example app you first have to set it up with your ZeroKit configuration. If you downloaded it from the management portal then it is already configured for you.
+The example app requires a backend to function. We created a sample backend that you can use for the mobile and web ZeroKit sample apps. You can find the backend and setup instructions [here](https://github.com/tresorit/ZeroKit-NodeJs-backend-sample).
 
-In the `ZeroKitExample/Info.plist` file set the value of the `ZeroKitAPIBaseURL` to your service URL (your tenant URL). If this file does not exist then copy the sample `Info.sample.plist` file in the same directory to create one:
+To use the example app you first have to set it up with your ZeroKit configuration. In the `ZeroKitExample/Config.plist` file set the values for `ZeroKitAPIBaseURL`, `ZeroKitClientId` and `ZeroKitAppBackend` keys. If this file does not exist then copy the sample `Config.sample.plist` file in the same directory to create one:
 
 ```xml
 <key>ZeroKitAPIBaseURL</key>
 <string>{TenantBaseUrl}</string>
-``` 
-
-In the `ZeroKitExample/ExampleAppMock/ExampleAppMock.plist` set the values for `AdminUserId`, `AdminKey` and `ApiRoot` (tenant URL). If this file does not exist then copy the sample `ExampleAppMock.sample.plist` file in the same directory to create one:
-
-```xml
-<key>AdminUserId</key>
-<string>admin@{TenantId}.tresorit.io</string>
-<key>AdminKey</key>
-<string>{AdminKey}</string>
-<key>ApiRoot</key>
-<string>{TenantBaseUrl}</string>
+<key>ZeroKitClientId</key>
+<string>{ClientId}</string>
+<key>ZeroKitAppBackend</key>
+<string>{AppBackendUrl}</string>
 ```
 
-**!!! IMPORTANT:** You must **never include your Admin key in your application**. All Admin key calls must be done by your backend. We implemented a mock application in this example so you can run it without setting up a server. The admin key must be kept secret and not included in any client applications that you distribute.
+- `ZeroKitAPIBaseURL`: This is your tenant's service URL. You can find this URL on the management portal.
+- `ZeroKitClientId`: This is the client ID for your OpenID Connect client that you wish to use with your mobile.
+- `ZeroKitAppBackend`: This is the URL of the sample application backend. You can find the sample backend and setup instructions [here](https://github.com/tresorit/ZeroKit-NodeJs-backend-sample).
 
 Now you are ready to **Build and Run** (**⌘R**) the example in Xcode.
 
-### Unit tests
+### Registering Test Users
+
+Register test users following the `'test-user-{XYZ}'` username format. These users will be automatically validated by the sample backend so you can log in right after registration.
+
+### Unit Tests
 
 You can also take a look at the unit tests in this project to see further examples. To run the tests you must have the example app configured as described in [Configuring the Example](#configuring-the-example).
 
