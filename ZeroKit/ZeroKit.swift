@@ -166,7 +166,7 @@ public extension ZeroKit {
      - parameter completion: Called when the strength calculation completes.
      */
     public func passwordStrength(password: String, completion: @escaping PasswordStrengthCallback) {
-        let pwParam = internalApi.escapeParameter(password)
+        let pwParam = InternalApi.escapeParameter(password)
         internalApi.runJavascript("zxcvbn(\"\(pwParam)\")") { result, error in
             DispatchQueue.main.async {
                 if let dict = result as? [String: Any], let strength = PasswordStrength(strengthDictionary: dict) {
@@ -432,7 +432,11 @@ public extension ZeroKit {
      */
     public func encrypt(plainData: Data, inTresor tresorId: String, completion: @escaping CipherDataCompletion) {
         let plainDataBase64 = plainData.base64EncodedString()
-        self.internalApi.callMethod("ios_cmd_api_encryptBytes", parameters: [tresorId, plainDataBase64]) { success, result in
+        
+        let params = [InternalApi.MethodParameter(plainValue: tresorId),
+                      InternalApi.MethodParameter(escapedValue: plainDataBase64)]
+        
+        self.internalApi.callMethod("ios_cmd_api_encryptBytes", methodParameters: params) { success, result in
             if let cipherDataBase64 = result as? String,
                 let cipherData = Data(base64Encoded: cipherDataBase64),
                 success {
@@ -451,7 +455,10 @@ public extension ZeroKit {
      */
     public func decrypt(cipherData: Data, completion: @escaping PlainDataCompletion) {
         let cipherDataBase64 = cipherData.base64EncodedString()
-        self.internalApi.callMethod("ios_cmd_api_decryptBytes", parameters: [cipherDataBase64]) { success, result in
+        
+        let params = [InternalApi.MethodParameter(escapedValue: cipherDataBase64)]
+        
+        self.internalApi.callMethod("ios_cmd_api_decryptBytes", methodParameters: params) { success, result in
             if let plainDataBase64 = result as? String,
                 let plainData = Data(base64Encoded: plainDataBase64),
                 success {

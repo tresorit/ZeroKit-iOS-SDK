@@ -5,6 +5,18 @@ class InternalApi: NSObject {
     typealias JsApiResultCallback = (/*success:*/ Bool, /*result:*/ AnyObject) -> Void
     typealias ErrorCallback = (Error?) -> Void
     
+    struct MethodParameter {
+        let value: String
+        
+        init(plainValue: String) {
+            self.value = InternalApi.escapeParameter(plainValue)
+        }
+        
+        init(escapedValue: String) {
+            self.value = escapedValue
+        }
+    }
+    
     private enum ApiState {
         case notLoaded
         case loading
@@ -62,17 +74,25 @@ class InternalApi: NSObject {
     // MARK: API calls
     
     func callMethod(_ methodOnObject: String, parameters: [String], callback: @escaping JsApiResultCallback) {
+        var methodParams = [MethodParameter]()
+        for param in parameters {
+            methodParams.append(MethodParameter(plainValue: param))
+        }
+        callMethod(methodOnObject, methodParameters: methodParams, callback: callback)
+    }
+    
+    func callMethod(_ methodOnObject: String, methodParameters: [MethodParameter], callback: @escaping JsApiResultCallback) {
         loadApi { error in
             if error != nil {
                 callback(false, ZeroKitError.apiLoadingError.nserrorValue)
             } else {
-                self.callMethodInner(methodOnObject, parameters: parameters, callback: callback)
+                self.callMethodInner(methodOnObject, methodParameters: methodParameters, callback: callback)
             }
         }
     }
     
-    private func callMethodInner(_ methodOnObject: String, parameters: [String], callback: @escaping JsApiResultCallback) {
-        let paramStr = parameterString(parameters)
+    private func callMethodInner(_ methodOnObject: String, methodParameters: [MethodParameter], callback: @escaping JsApiResultCallback) {
+        let paramStr = InternalApi.parameterString(methodParameters)
         let callbackId = UUID().uuidString
         callbacks[callbackId] = callback
         
@@ -96,15 +116,15 @@ class InternalApi: NSObject {
         }
     }
     
-    private func parameterString(_ parameters: [String]) -> String {
+    class private func parameterString(_ parameters: [MethodParameter]) -> String {
         var escapedParams = [String]()
-        for p in parameters {
-            escapedParams.append("\"\(escapeParameter(p))\"")
+        for param in parameters {
+            escapedParams.append(String(format: "\"%@\"", param.value))
         }
         return escapedParams.joined(separator: ",")
     }
     
-    func escapeParameter(_ parameter: String) -> String {
+    class func escapeParameter(_ parameter: String) -> String {
         var escaped = ""
         
         for unicode in parameter.unicodeScalars {
