@@ -152,7 +152,11 @@ An example appliction is included with ZeroKit to demonstrate its usage. Open th
 
 ### Configuring the Example
 
+#### Step 1 - Set up the backend
+
 The example app requires a backend to function. We created a sample backend that you can use for the mobile and web ZeroKit sample apps. You can find the backend and setup instructions [here](https://github.com/tresorit/ZeroKit-NodeJs-backend-sample).
+
+#### Step 2 - Configure the iOS example app
 
 To use the example app you first have to set it up with your ZeroKit configuration. In the `ZeroKitExample/Config.plist` file set the values for `ZeroKitAPIBaseURL`, `ZeroKitClientId` and `ZeroKitAppBackend` keys. If this file does not exist then copy the sample `Config.sample.plist` file in the same directory to create one:
 
