@@ -5,24 +5,13 @@ class InternalApi: NSObject {
     typealias JsApiResultCallback = (/*success:*/ Bool, /*result:*/ AnyObject) -> Void
     typealias ErrorCallback = (Error?) -> Void
     
-    struct MethodParameter {
-        let value: String
-        
-        init(plainValue: String) {
-            self.value = InternalApi.escapeParameter(plainValue)
-        }
-        
-        init(escapedValue: String) {
-            self.value = escapedValue
-        }
-    }
-    
     private enum ApiState {
         case notLoaded
         case loading
         case didLoad
     }
     
+    private let backgroundQueue = DispatchQueue(label: "com.tresorit.zerokit.internal", qos: .default, attributes: [])
     private let apiUrl: URL
     private var apiState = ApiState.notLoaded
     private var webView: WKWebView!
@@ -73,55 +62,67 @@ class InternalApi: NSObject {
     
     // MARK: API calls
     
-    func callMethod(_ methodOnObject: String, parameters: [String], callback: @escaping JsApiResultCallback) {
-        var methodParams = [MethodParameter]()
-        for param in parameters {
-            methodParams.append(MethodParameter(plainValue: param))
+    func callMethod(_ methodOnObject: String, parameters: [Any], callback: @escaping JsApiResultCallback) {
+        DispatchQueue.main.async {
+            self.loadApi { error in
+                if error != nil {
+                    callback(false, ZeroKitError.apiLoadingError.nserrorValue)
+                } else {
+                    self.callMethodInner(methodOnObject, parameters: parameters, callback: callback)
+                }
+            }
         }
-        callMethod(methodOnObject, methodParameters: methodParams, callback: callback)
     }
     
-    func callMethod(_ methodOnObject: String, methodParameters: [MethodParameter], callback: @escaping JsApiResultCallback) {
-        loadApi { error in
-            if error != nil {
-                callback(false, ZeroKitError.apiLoadingError.nserrorValue)
+    private func callMethodInner(_ methodOnObject: String, parameters: [Any], callback: @escaping JsApiResultCallback) {
+        backgroundQueue.async {
+            
+            guard JSONSerialization.isValidJSONObject(parameters) else {
+                DispatchQueue.main.async {
+                    callback(false, ZeroKitError.badInput.nserrorValue)
+                }
+                return
+            }
+            
+            let paramStr: String
+            
+            do {
+                paramStr = try InternalApi.jsonString(withObject: parameters)
+            } catch {
+                DispatchQueue.main.async {
+                    callback(false, error as NSError)
+                }
+                return
+            }
+            
+            let callbackId = UUID().uuidString
+            
+            let object: String
+            if let lastDot = methodOnObject.range(of: ".", options: .backwards, range: nil, locale: nil) {
+                object = methodOnObject.substring(to: lastDot.lowerBound)
             } else {
-                self.callMethodInner(methodOnObject, methodParameters: methodParameters, callback: callback)
+                object = "null"
+            }
+            
+            let js = "ios_callApiMethod(\(object), \(methodOnObject), \"\(callbackId)\", \(paramStr))"
+            
+            DispatchQueue.main.async {
+                self.callbacks[callbackId] = callback
+                self.webView!.evaluateJavaScript(js) { (obj: Any?, error: Error?) in
+                    if error != nil {
+                        print("ZeroKit error evaluating javascript")
+                    }
+                }
             }
         }
     }
     
-    private func callMethodInner(_ methodOnObject: String, methodParameters: [MethodParameter], callback: @escaping JsApiResultCallback) {
-        let paramStr = InternalApi.parameterString(methodParameters)
-        let callbackId = UUID().uuidString
-        callbacks[callbackId] = callback
-        
-        let object: String
-        if let lastDot = methodOnObject.range(of: ".", options: .backwards, range: nil, locale: nil) {
-            object = methodOnObject.substring(to: lastDot.lowerBound)
-        } else {
-            object = "null"
+    class private func jsonString(withObject: Any) throws -> String {
+        let jsonData = try JSONSerialization.data(withJSONObject: withObject, options: [])
+        if let jsonStr = String(data: jsonData, encoding: .utf8) {
+            return jsonStr
         }
-        
-        var js = "ios_callApiMethod(\(object), \(methodOnObject), \"\(callbackId)\""
-        if paramStr.characters.count > 0 {
-            js.append(", \(paramStr)")
-        }
-        js.append(")")
-        
-        self.webView!.evaluateJavaScript(js) { (obj: Any?, error: Error?) in
-            if error != nil {
-                print("ZeroKit error evaluating javascript")
-            }
-        }
-    }
-    
-    class private func parameterString(_ parameters: [MethodParameter]) -> String {
-        var escapedParams = [String]()
-        for param in parameters {
-            escapedParams.append(String(format: "\"%@\"", param.value))
-        }
-        return escapedParams.joined(separator: ",")
+        throw ZeroKitError.unknownError
     }
     
     class func escapeParameter(_ parameter: String) -> String {

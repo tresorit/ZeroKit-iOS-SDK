@@ -46,11 +46,7 @@ function ios_cmd_api_decryptBytes(base64CipherBytes) {
     })
 }
 
-function ios_callApiMethod(object, method, callbackId) {
-    /* Additional arguments after the first 3 named arguments.
-     These will be passed to the api method. */
-    var methodArgs = Array.prototype.splice.call(arguments, 3);
-    
+function ios_callApiMethod(object, method, callbackId, methodArgs) {
     method.apply(object, methodArgs).then(function(succ) {
         window.webkit.messageHandlers.ZeroKitHandler.postMessage([true, callbackId, succ])
     }, function(err) {

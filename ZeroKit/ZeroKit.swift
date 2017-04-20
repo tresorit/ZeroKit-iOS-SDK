@@ -7,6 +7,7 @@ import WebKit
  */
 public class ZeroKit: NSObject {
     
+    fileprivate let backgroundQueue = DispatchQueue(label: "com.tresorit.zerokit.background", qos: .default, attributes: [])
     fileprivate let config: ZeroKitConfig
     fileprivate var internalApi: InternalApi!
     fileprivate var idpQuery: IdentityProvider?
@@ -431,18 +432,27 @@ public extension ZeroKit {
      - parameter completion: Called when encryption finishes, contains the cipher data if successful
      */
     public func encrypt(plainData: Data, inTresor tresorId: String, completion: @escaping CipherDataCompletion) {
-        let plainDataBase64 = plainData.base64EncodedString()
-        
-        let params = [InternalApi.MethodParameter(plainValue: tresorId),
-                      InternalApi.MethodParameter(escapedValue: plainDataBase64)]
-        
-        self.internalApi.callMethod("ios_cmd_api_encryptBytes", methodParameters: params) { success, result in
-            if let cipherDataBase64 = result as? String,
-                let cipherData = Data(base64Encoded: cipherDataBase64),
-                success {
-                completion(cipherData, nil)
-            } else {
-                completion(nil, ZeroKitError.from(result).nserrorValue)
+        backgroundQueue.async {
+            
+            let plainDataBase64 = plainData.base64EncodedString()
+            
+            self.internalApi.callMethod("ios_cmd_api_encryptBytes", parameters: [tresorId, plainDataBase64]) { success, result in
+                
+                self.backgroundQueue.async {
+                    
+                    if let cipherDataBase64 = result as? String,
+                        let cipherData = Data(base64Encoded: cipherDataBase64),
+                        success {
+                        
+                        DispatchQueue.main.async {
+                            completion(cipherData, nil)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            completion(nil, ZeroKitError.from(result).nserrorValue)
+                        }
+                    }
+                }
             }
         }
     }
@@ -454,17 +464,27 @@ public extension ZeroKit {
      - parameter completion: Called when decryption finishes, contains the plain data if successful
      */
     public func decrypt(cipherData: Data, completion: @escaping PlainDataCompletion) {
-        let cipherDataBase64 = cipherData.base64EncodedString()
-        
-        let params = [InternalApi.MethodParameter(escapedValue: cipherDataBase64)]
-        
-        self.internalApi.callMethod("ios_cmd_api_decryptBytes", methodParameters: params) { success, result in
-            if let plainDataBase64 = result as? String,
-                let plainData = Data(base64Encoded: plainDataBase64),
-                success {
-                completion(plainData, nil)
-            } else {
-                completion(nil, ZeroKitError.from(result).nserrorValue)
+        backgroundQueue.async {
+            
+            let cipherDataBase64 = cipherData.base64EncodedString()
+            
+            self.internalApi.callMethod("ios_cmd_api_decryptBytes", parameters: [cipherDataBase64]) { success, result in
+                
+                self.backgroundQueue.async {
+                    
+                    if let plainDataBase64 = result as? String,
+                        let plainData = Data(base64Encoded: plainDataBase64),
+                        success {
+                        
+                        DispatchQueue.main.async {
+                            completion(plainData, nil)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            completion(nil, ZeroKitError.from(result).nserrorValue)
+                        }
+                    }
+                }
             }
         }
     }
