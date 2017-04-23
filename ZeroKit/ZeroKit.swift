@@ -5,7 +5,7 @@ import WebKit
  
  - note: The ZeroKit API is not thread safe, call only from the main thread.
  */
-public class ZeroKit: NSObject {
+open class ZeroKit: NSObject {
     
     fileprivate let config: ZeroKitConfig
     fileprivate var internalApi: InternalApi!
