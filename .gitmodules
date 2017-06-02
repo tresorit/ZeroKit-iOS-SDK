@@ -1,0 +1,3 @@
+[submodule "ZeroKitNative"]
+	path = ZeroKitNative
+	url = https://github.com/tresorit/ZeroKit-Client-Native-Crypto.git
