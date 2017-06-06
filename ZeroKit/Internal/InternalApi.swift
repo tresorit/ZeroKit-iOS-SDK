@@ -188,14 +188,14 @@ class InternalApi: NSObject {
                 Log.log(level: logLevel, format: "Javascript Log unexpected type")
             }
         }
-        context.setObject(logCallback, forKeyedSubscript: "LogCallback" as NSString)
+        context.setObject(logCallback as Any, forKeyedSubscript: "LogCallback" as NSString)
         
         let setTimeout: @convention(block) (JSValue, Int) -> Void = { [weak self] (function, timeout) in
             self?.queue.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(timeout), execute: {
                 function.call(withArguments: [])
             })
         }
-        context.setObject(setTimeout, forKeyedSubscript: "setTimeout" as NSString)
+        context.setObject(setTimeout as Any, forKeyedSubscript: "setTimeout" as NSString)
         
         let resultCallback: @convention(block) (Bool, String, JSValue) -> Void = { [weak self] success, callbackId, result in
             DispatchQueue.main.async {
@@ -203,7 +203,7 @@ class InternalApi: NSObject {
                 callback?(success, result)
             }
         }
-        context.setObject(resultCallback, forKeyedSubscript: "ZeroKitResultCallback" as NSString)
+        context.setObject(resultCallback as Any, forKeyedSubscript: "ZeroKitResultCallback" as NSString)
         
         let xhrCallback: @convention(block) (JSValue, JSValue, JSValue, JSValue, JSValue) -> Void = { [weak self] method, url, headers, bodyBase64, completionCallback in
             guard let urlSession = self?.urlSession else {
@@ -233,7 +233,7 @@ class InternalApi: NSObject {
             
             task.resume()
         }
-        context.setObject(xhrCallback, forKeyedSubscript: "XHRCallbackInner" as NSString)
+        context.setObject(xhrCallback as Any, forKeyedSubscript: "XHRCallbackInner" as NSString)
         
         context.setObject(localStorage, forKeyedSubscript: "mockLocalStorage" as NSString)
         context.setObject(sessionStorage, forKeyedSubscript: "mockSessionStorage" as NSString)
