@@ -1,0 +1,10 @@
+
+HEADER_SEARCH_PATHS = "$(SRCROOT)/ZeroKitNative"
+
+_LIBS_DIR = $(SRCROOT)/out
+
+LIBRARY_SEARCH_PATHS[arch=arm64] = "$(_LIBS_DIR)/ios_arm64"
+LIBRARY_SEARCH_PATHS[arch=armv7] = "$(_LIBS_DIR)/ios_arm"
+LIBRARY_SEARCH_PATHS[arch=i386] = "$(_LIBS_DIR)/ios_x86"
+LIBRARY_SEARCH_PATHS[arch=x86_64] = "$(_LIBS_DIR)/ios_x64"
+

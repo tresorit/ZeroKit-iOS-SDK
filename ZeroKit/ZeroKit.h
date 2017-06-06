@@ -7,3 +7,4 @@ FOUNDATION_EXPORT double ZeroKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char ZeroKitVersionString[];
 
 #import <ZeroKit/CryptoSupport.h>
+#import <ZeroKit/ZeroKitClientNative.h>

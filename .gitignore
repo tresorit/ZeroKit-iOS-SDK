@@ -42,4 +42,5 @@ Carthage/Build
 
 # ZeroKit
 Example/ZeroKitExample/Config.plist
+out/*
 

@@ -1,16 +1,8 @@
-//
-//  Backend.swift
-//  ZeroKitExample
-//
-//  Created by László Agárdi on 2017. 02. 27..
-//  Copyright © 2017. Tresorit Kft. All rights reserved.
-//
-
 import UIKit
 import ZeroKit
 
 public enum BackendError: Int, Error {
-    case unknownError = 1
+    case unexpectedError = 1
     case notImplemented
     case authorizationRequired
 }
@@ -55,7 +47,7 @@ public class Backend: NSObject {
                     let regSessionId = dict["regSessionId"],
                     error == nil else {
                         
-                        completion(nil, nil, error ?? BackendError.unknownError)
+                        completion(nil, nil, error ?? BackendError.unexpectedError)
                         return
                 }
                 
@@ -98,7 +90,7 @@ public class Backend: NSObject {
                     let token = dict["id"] as? String,
                     error == nil else {
                         
-                        completion(error ?? BackendError.unknownError)
+                        completion(error ?? BackendError.unexpectedError)
                         return
                 }
                 
@@ -300,7 +292,7 @@ public class Backend: NSObject {
                         }
                         
                     } else {
-                        completion(nil, error ?? BackendError.unknownError)
+                        completion(nil, error ?? BackendError.unexpectedError)
                     }
                 }
             }
@@ -315,7 +307,7 @@ public class Backend: NSObject {
         if let parameters = parameters, parameters.count > 0 {
             let paramArray = parameters.reduce([String]()) { (acc: [String], item: (key: String, value: String)) -> [String] in
                 var macc = acc
-                macc.append(String(format: "%@=%@", item.key, item.value.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!))
+                macc.append(String(format: "%@=%@", item.key, item.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!))
                 return macc
             }
             

@@ -35,25 +35,46 @@ public class ZeroKitIdentityTokens: NSObject {
  */
 class IdentityProvider: NSObject, WKNavigationDelegate {
     private let webView: WKWebView
+    private let internalApi: InternalApi
+    
     private let clientId: String
-    private let config: ZeroKitConfig
     private let redirectUrl: String
     private var state: String?
     private var codeVerifier: String?
+    
+    private var isCancelled = false
+    private var isServiceUrlPageLoaded = false
+    
+    private var useProofKey = false
     private var completion: ZeroKit.IdentityTokensCompletion?
     
     deinit {
-        self.webView.stopLoading()
-        self.webView.removeFromSuperview()
+        let wv = self.webView
+        DispatchQueue.main.async {
+            // Call webview only from main thread
+            wv.stopLoading()
+            wv.removeFromSuperview()
+        }
     }
     
-    init(clientId: String, config: ZeroKitConfig, processPool: WKProcessPool, webviewHostView: UIView) {
+    init(clientId: String, internalApi: InternalApi, webviewHostView: UIView) {
+        
+        let scriptJsUrl = Bundle(for: IdentityProvider.classForCoder()).url(forResource: "IDP", withExtension: "js")!
+        let scriptJs = try! String(contentsOf: scriptJsUrl)
+        let script = WKUserScript(source: scriptJs, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        
+        let controller = WKUserContentController()
+        controller.addUserScript(script)
+        
         let webViewConfig = WKWebViewConfiguration()
-        webViewConfig.processPool = processPool
+        webViewConfig.userContentController = controller;
+
         self.webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: webViewConfig)
         self.clientId = clientId
-        self.config = config
-        self.redirectUrl = String(format: "%@://%@.%@/", config.apiBaseUrl.scheme!, clientId, config.apiBaseUrl.host!)
+        
+        let serviceUrl = internalApi.config.apiBaseUrl
+        self.redirectUrl = String(format: "%@://%@.%@/", serviceUrl.scheme!, clientId, serviceUrl.host!)
+        self.internalApi = internalApi
         
         super.init()
         
@@ -62,6 +83,38 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
     }
     
     func getIdentityTokens(useProofKey: Bool, completion: @escaping ZeroKit.IdentityTokensCompletion) {
+        self.completion = completion
+        self.useProofKey = useProofKey
+        
+        // Load page for service URL. Only after that can we set the cookies.
+        webView.loadHTMLString("", baseURL: internalApi.config.apiBaseUrl)
+    }
+    
+    private func setCookiesAndData() {
+        let parameters: [Any] = [
+            internalApi.persistenceKeys.cookies(for: internalApi.config.apiBaseUrl.host!),
+            internalApi.localStorage.allItems().map { [$0, $1] },
+            internalApi.sessionStorage.allItems().map { [$0, $1] }
+        ]
+        
+        let jsonParameters = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+        let jsonStringParameters = String(data: jsonParameters, encoding: .utf8)!
+
+        let js = String(format: "ios_setCookiesAndData(%@)", jsonStringParameters)
+        webView.evaluateJavaScript(js) { _, error in
+            if error != nil {
+                self.completion?(nil, NSError(error))
+            } else {
+                self.sendIdentityTokensRequest()
+            }
+        }
+    }
+    
+    private func sendIdentityTokensRequest() {
+        if self.isCancelled {
+            return
+        }
+        
         do {
             self.state = try IdentityProvider.generateCode()
             
@@ -82,23 +135,20 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
             }
             
             let urlStr = String(format: "%@?%@",
-                                config.idpAuthUrl.absoluteString,
+                                internalApi.config.idpAuthUrl.absoluteString,
                                 String.zk_fromUrlParamDict(dictionary: params))
             
-            self.completion = completion
             self.webView.load(URLRequest(url: URL(string: urlStr)!))
             
-        } catch let error as NSError {
-            completion(nil, error)
-            return
         } catch {
-            completion(nil, ZeroKitError.unknownError.nserrorValue)
+            self.completion?(nil, NSError(error))
             return
         }
     }
     
     func cancelRequest() {
-        self.didFail(with: ZeroKitError.userInterrupted.nserrorValue)
+        self.isCancelled = true
+        self.didFail(with: NSError(ZeroKitError.userInterrupted))
         self.webView.stopLoading()
     }
     
@@ -131,31 +181,38 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
     }
     
     private class func secureRandom32() throws -> UInt32 {
-        let randomBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
-        if (SecRandomCopyBytes(kSecRandomDefault, 4, randomBytes) != errSecSuccess) {
-            throw ZeroKitError.internalError.nserrorValue
+        var data = Data(count: 4)
+        let result = data.withUnsafeMutableBytes { (mutableBytes: UnsafeMutablePointer<UInt8>) -> Int32 in
+            return SecRandomCopyBytes(kSecRandomDefault, data.count, mutableBytes)
         }
-        return randomBytes.withMemoryRebound(to: UInt32.self, capacity: 4) {
-            return $0.pointee
+        if result != errSecSuccess {
+            throw NSError(ZeroKitError.internalError, message: String(format: "Error getting random bytes, result: %d.", result))
         }
+        return (UInt32(data[0]) << 24) | (UInt32(data[1]) << 16) | (UInt32(data[2]) << 8) | UInt32(data[3]);
     }
     
     // MARK: WKNavigationDelegate
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if !isServiceUrlPageLoaded {
+            isServiceUrlPageLoaded = true
+            setCookiesAndData()
+            return
+        }
+        
         // Check if error happened
         let errorHappened = "ErrorHappened"
         webView.evaluateJavaScript("if (document.querySelector('div.container').contains(document.querySelector('.lead.ng-binding')) && document.querySelector('div.alert.alert-danger').contains(document.querySelector('div.ng-binding'))) { \"\(errorHappened)\" } else { \"noError\" }") { [weak self] obj, error in
             
             if let result = obj as? String, result == errorHappened && error == nil {
-                self?.didFail(with: ZeroKitError.unknownError.nserrorValue)
+                self?.didFail(with: NSError(nil))
                 self?.webView.stopLoading()
             }
         }
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.didFail(with: ZeroKitError.unknownError.nserrorValue)
+        self.didFail(with: NSError(error))
         self.webView.stopLoading()
     }
     
@@ -175,7 +232,7 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         let state = parameters["state"]
         
         if state == nil || state! != self.state! {
-            self.didFail(with: ZeroKitError.invalidResponse.nserrorValue)
+            self.didFail(with: NSError(ZeroKitError.invalidResponse))
             
         } else if let tokens = ZeroKitIdentityTokens(parameters: parameters, codeVerifier: self.codeVerifier) {
             self.didComplete(with: tokens)
@@ -190,14 +247,14 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
                     // Retry with proof key
                     self.getIdentityTokens(useProofKey: true, completion: self.completion!)
                 } else {
-                    self.didFail(with: ZeroKitError.invalidRequest.nserrorValue)
+                    self.didFail(with: NSError(ZeroKitError.invalidRequest))
                 }
                 
             case "login_required":
-                self.didFail(with: ZeroKitError.loginRequired.nserrorValue)
+                self.didFail(with: NSError(ZeroKitError.loginRequired))
                 
             default:
-                self.didFail(with: ZeroKitError.unknownError.nserrorValue)
+                self.didFail(with: NSError(error))
             }
         }
     }
@@ -235,7 +292,7 @@ extension String {
     static func zk_fromUrlParamDict(dictionary: [String: String]) -> String {
         let paramArray = dictionary.reduce([String]()) { (acc: [String], item: (key: String, value: String)) -> [String] in
             var macc = acc
-            macc.append(String(format: "%@=%@", item.key, item.value.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!))
+            macc.append(String(format: "%@=%@", item.key, item.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!))
             return macc
         }
         

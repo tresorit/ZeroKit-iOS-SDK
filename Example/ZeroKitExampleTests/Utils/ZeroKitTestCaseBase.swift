@@ -30,7 +30,7 @@ class ZeroKitTestCaseBase: XCTestCase {
         let backendUrl = URL(string: configDict["ZeroKitAppBackend"] as! String)!
         
         let config = ZeroKitConfig(apiBaseUrl: apiUrl)
-        let zeroKit = try! ZeroKit(config: config)
+        let zeroKit = ZeroKit(config: config)
         
         let backend = Backend(withBackendBaseUrl: backendUrl, authorizationCallback: { credentialsCallback in
             zeroKit.getIdentityTokens(clientId: clientId) { tokens, error in
@@ -154,7 +154,7 @@ class ZeroKitTestCaseBase: XCTestCase {
         
         var tresorId: String!
         
-        let expectation = self.expectation(description: "Tresor creation")
+        let exptectTresorCreation = self.expectation(description: "Tresor creation")
         
         zeroKitStack.zeroKit.createTresor { aTresorId, error in
             guard error == nil else {
@@ -162,14 +162,21 @@ class ZeroKitTestCaseBase: XCTestCase {
                 return
             }
             
-            zeroKitStack.backend.createdTresor(tresorId: aTresorId!) { error in
-                XCTAssert(error == nil)
-                tresorId = aTresorId
-                expectation.fulfill()
-            }
+            tresorId = aTresorId
+            exptectTresorCreation.fulfill()
         }
         
         waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        let expectTresorApproval = self.expectation(description: "Tresor creation approval")
+        
+        zeroKitStack.backend.createdTresor(tresorId: tresorId) { error in
+            XCTAssert(error == nil)
+            expectTresorApproval.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
         return tresorId
     }
     

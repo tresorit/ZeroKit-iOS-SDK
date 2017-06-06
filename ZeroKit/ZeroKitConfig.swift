@@ -7,7 +7,7 @@ import UIKit
  */
 public class ZeroKitConfig: NSObject, NSCopying {
     let apiBaseUrl: URL
-    let apiUrl: URL
+    let apiJsUrls: [URL]
     let idpAuthUrl: URL
     
     /**
@@ -29,7 +29,17 @@ public class ZeroKitConfig: NSObject, NSCopying {
      */
     public init(apiBaseUrl: URL) {
         self.apiBaseUrl = apiBaseUrl
-        self.apiUrl = apiBaseUrl.appendingPathComponent("static/v4/api.html")
+        
+        let bundle = Bundle(for: ZeroKitConfig.classForCoder())
+        self.apiJsUrls = [
+            apiBaseUrl.appendingPathComponent("static/v4/jsCorePrelude.js"),
+            bundle.url(forResource: "ZeroKitInit", withExtension: "js")!,
+            apiBaseUrl.appendingPathComponent("static/v4/worker-session-es6.js"),
+            apiBaseUrl.appendingPathComponent("static/v4/jsCoreWrapper.js"),
+            apiBaseUrl.appendingPathComponent("static/js/zxcvbn.js"),
+            bundle.url(forResource: "ZeroKit", withExtension: "js")!
+        ]
+        
         self.idpAuthUrl = apiBaseUrl.appendingPathComponent("idp/connect/authorize")
         self.keychainAccessibility = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
     }

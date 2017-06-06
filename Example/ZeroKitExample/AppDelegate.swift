@@ -24,6 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func zeroKitInit() {
+        ZeroKit.logLevel = .info
+        
         let configFile = Bundle.main.url(forResource: "Config", withExtension: "plist")!
         let configDict = NSDictionary(contentsOf: configFile)!
         
@@ -32,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let backendUrl = URL(string: configDict["ZeroKitAppBackend"] as! String)!
         
         let config = ZeroKitConfig(apiBaseUrl: apiUrl)
-        zeroKit = try! ZeroKit(config: config)
+        zeroKit = ZeroKit(config: config)
         
         backend = Backend(withBackendBaseUrl: backendUrl, authorizationCallback: { [weak self] credentialsCallback in
             self?.zeroKit?.getIdentityTokens(clientId: clientId) { tokens, error in

@@ -1,4 +1,17 @@
 # Change Log
+## [4.2.0](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/4.2.0)
+### Changes
+- ZeroKit has been rewritten to use the JavaScriptCore framework to execute javascript instead of WKWebView.
+- Javascript execution is now possible while the app is in the background.
+- Cryptographic operations are implemented in native code providing improved performance over javascript implementations.
+
+### Added
+- New error codes.
+- More descriptive error messages for developers. This includes descriptions and origin of errors.
+
+### Removed
+- Removed deprecated APIs: `ZeroKit.DidFailLoadingNotification`, `ZeroKit.DidLoadNotification`, `ZeroKit.isLoaded`.
+
 ## [4.1.1](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/4.1.1) - 2017-04-05
 ### Fixed
 - Identity provider redirect URL when configured ZeroKit with a service URL ending with a slash or with deprecated `apiUrl` method.

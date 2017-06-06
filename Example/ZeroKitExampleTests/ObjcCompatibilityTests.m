@@ -29,10 +29,7 @@
     NSURL *backendURL = [NSURL URLWithString:configDict[@"ZeroKitAppBackend"]];
     
     ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiURL];
-    
-    NSError *error = nil;
-    ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
-    XCTAssertNil(error);
+    ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config];
     
     Backend *backend = [[Backend alloc] initWithBackendBaseUrl:backendURL authorizationCallback:^(void (^credentialsCallback)(NSString * _Nullable, NSString * _Nullable, NSError * _Nullable)) {
         [zeroKit getIdentityTokensWithClientId:clientID completion:^(ZeroKitIdentityTokens * _Nullable tokens, NSError * _Nullable error) {

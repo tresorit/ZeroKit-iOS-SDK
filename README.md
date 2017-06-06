@@ -52,7 +52,7 @@ To integrate ZeroKit into your Xcode project using CocoaPods, specify it in your
 ```ruby
 target '<Your Target>' do
   use_frameworks!
-  pod 'ZeroKit', '~> 4.1'
+  pod 'ZeroKit', '~> 4.2'
 end
 ```
 
@@ -185,7 +185,7 @@ You can also take a look at the unit tests in this project to see further exampl
 
 ## Migration Guides
 
-### Migration to 4.1.0
+### Migration to 4.1.0 or later from 4.0.x
 
 #### Initialization
 

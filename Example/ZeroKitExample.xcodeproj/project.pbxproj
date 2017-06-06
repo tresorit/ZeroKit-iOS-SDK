@@ -47,6 +47,13 @@
 			remoteGlobalIDString = E762F05F1D9C193500170D9F;
 			remoteInfo = ZeroKit;
 		};
+		E71BA0501EC35FFE006B498F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E70E91191D9D113200F5A987 /* ZeroKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E7C57F401EC071C000F145DD;
+			remoteInfo = ZeroKitTests;
+		};
 		E7A599C81D93D79B0035DB13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E7808FAD1D76E9660061FEB4 /* Project object */;
@@ -121,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				E70E911E1D9D113200F5A987 /* ZeroKit.framework */,
+				E71BA0511EC35FFE006B498F /* ZeroKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -307,6 +315,13 @@
 			fileType = wrapper.framework;
 			path = ZeroKit.framework;
 			remoteRef = E70E911D1D9D113200F5A987 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E71BA0511EC35FFE006B498F /* ZeroKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ZeroKitTests.xctest;
+			remoteRef = E71BA0501EC35FFE006B498F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -512,12 +527,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 986R6FFN66;
 				INFOPLIST_FILE = ZeroKitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tresorit.ZeroKitExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "c3875884-7b8a-4dd7-8de3-d0738072d766";
+				PROVISIONING_PROFILE_SPECIFIER = "Tresorit Development Wildcard";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
