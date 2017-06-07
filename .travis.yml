@@ -4,5 +4,6 @@ script:
 - python Example/Scripts/config.py -b $BASE_URL_V3 -c $CLIENT_ID_V3 -a $APP_BACKEND_URL_V3
 - xcodebuild -version
 - xcodebuild -showsdks
-- xcodebuild -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -destination "platform=iOS Simulator,name=iPhone 7" -sdk iphonesimulator -configuration Debug test
-- xcodebuild -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -destination "platform=iOS Simulator,name=iPhone 6s,OS=9.3" -sdk iphonesimulator -configuration Debug test
+- xcodebuild build -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7"
+- xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7,OS=10.1"
+- xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 6s,OS=9.3"
