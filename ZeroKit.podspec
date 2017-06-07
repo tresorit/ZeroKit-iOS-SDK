@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.license      = "BSD-3-Clause"
   s.author       = { "Tresorit" => "zerokit@tresorit.com" }
   s.platform     = :ios, "8.0"
-  s.source       = { :git => "https://github.com/tresorit/ZeroKit-iOS-SDK.git", :tag => s.version }
-  s.source_files = "ZeroKit/**/*.{swift,h,m}"
+  s.source       = { :git => "https://github.com/tresorit/ZeroKit-iOS-SDK.git", :tag => s.version, :submodules => true }
+  s.source_files = "ZeroKit/**/*.{swift,h,m}", "ZeroKitNative/ZeroKitClientNative.h"
   s.resources    = "ZeroKit/**/*.js"
 end
