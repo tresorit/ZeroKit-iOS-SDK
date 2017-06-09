@@ -12,6 +12,7 @@
 
 - (void)setUp {
     [super setUp];
+    ZeroKit.logLevel = ZeroKitLogLevelWarning;
     [self resetZeroKit];
 }
 

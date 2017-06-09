@@ -206,7 +206,13 @@ class InternalApi: NSObject {
         context.setObject(resultCallback as Any, forKeyedSubscript: "ZeroKitResultCallback" as NSString)
         
         let xhrCallback: @convention(block) (JSValue, JSValue, JSValue, JSValue, JSValue) -> Void = { [weak self] method, url, headers, bodyBase64, completionCallback in
+            let defaultHeaders = [AnyHashable: Any]()
+            let defaultStatus = 0
+            let defaultData = NSNull()
+            
             guard let urlSession = self?.urlSession else {
+                Log.v("XHR request for url %@ failed.", url.toString() ?? "<nil>")
+                completionCallback.call(withArguments: [defaultHeaders, defaultStatus, defaultData])
                 return
             }
             
@@ -223,12 +229,37 @@ class InternalApi: NSObject {
                 request.httpBody = Data(base64Encoded: bodyBase64.toString()!)!
             }
             
+            let startDate = Date()
+            
+            if Log.shouldLog(.verbose) {
+                var bodyString = "<nil>"
+                if let body = request.httpBody {
+                    bodyString = String(data: body, encoding: .utf8) ?? bodyBase64.toString() ?? bodyString
+                }
+                Log.v("XHR request url: %@, method: %@, headers: %@, body: %@", url.toString()!, method.toString()!, headersMap, bodyString)
+            }
+            
             let task = urlSession.dataTask(with: request as URLRequest) { (data, response, error) in
                 let httpResponse = response as? HTTPURLResponse
-                let responseData: Any = data?.base64EncodedString() ?? NSNull()
-                completionCallback.call(withArguments: [httpResponse?.allHeaderFields ?? [:],
-                                                        httpResponse?.statusCode ?? 0,
-                                                        responseData])
+                let responseData = data?.base64EncodedString()
+                
+                if Log.shouldLog(.verbose) {
+                    let duration = Date().timeIntervalSince(startDate)
+                    var dataStr = "<nil>"
+                    if let data = data {
+                        dataStr = String(data: data, encoding: .utf8) ?? dataStr
+                    }
+                    
+                    if let error = error as NSError? {
+                        Log.v("XHR response (%.2fs) error: %@", duration, error)
+                    } else {
+                        Log.v("XHR response (%.2fs) url: %@, status code: %d, headers: %@, data: %@", duration, httpResponse?.url?.absoluteString ?? "<nil>", httpResponse?.statusCode ?? 0, httpResponse?.allHeaderFields ?? "<nil>", dataStr)
+                    }
+                }
+                
+                completionCallback.call(withArguments: [httpResponse?.allHeaderFields ?? defaultHeaders,
+                                                        httpResponse?.statusCode ?? defaultStatus,
+                                                        responseData ?? defaultData])
             }
             
             task.resume()

@@ -8,15 +8,39 @@
 
 import Foundation
 
-public enum ZeroKitLogLevel: UInt8 {
+/**
+ Log level specifies how much information is logged. The higher the log level, the more information is logged. In production do not use log levels higher than `warning`.
+ */
+@objc public enum ZeroKitLogLevel: UInt8 {
+    /**
+     All ZeroKit logging is turned off.
+     */
+    case off = 0
+    /**
+     Logs errors only.
+     */
     case error
+    /**
+     Logs warnings and errors.
+     */
     case warning
+    /**
+     Logs information in addtion to errors and warnings.
+     */
     case info
+    /**
+     Logs information that is useful for debugging purposes. **May log sensitive information. Use in debug builds only.**
+     */
     case debug
+    /**
+     Logs all messages. **May log sensitive information. Use in debug builds only.**
+     */
     case verbose
     
     var stringValue: String {
         switch self {
+        case .off:
+            return "OFF"
         case .error:
             return "ERROR"
         case .warning:
@@ -89,9 +113,13 @@ class Log: NSObject {
     }
     
     class func log(level: ZeroKitLogLevel, format: String, args: [CVarArg]) {
-        if level.rawValue <= self.level.rawValue {
+        if self.shouldLog(level) {
             let message = String(format: format, arguments: args)
             NSLog("ZeroKit[%@]: %@", level.stringValue, message)
         }
+    }
+    
+    class func shouldLog(_ level: ZeroKitLogLevel) -> Bool {
+        return ZeroKitLogLevel.off.rawValue < level.rawValue && level.rawValue <= self.level.rawValue
     }
 }

@@ -13,15 +13,71 @@ class ZeroKitTests: XCTestCase {
         super.tearDown()
     }
     
+    func testLogLevel() {
+        ZeroKit.logLevel = .off
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertFalse(Log.shouldLog(.error))
+        XCTAssertFalse(Log.shouldLog(.warning))
+        XCTAssertFalse(Log.shouldLog(.info))
+        XCTAssertFalse(Log.shouldLog(.debug))
+        XCTAssertFalse(Log.shouldLog(.verbose))
+        
+        ZeroKit.logLevel = .error
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertTrue(Log.shouldLog(.error))
+        XCTAssertFalse(Log.shouldLog(.warning))
+        XCTAssertFalse(Log.shouldLog(.info))
+        XCTAssertFalse(Log.shouldLog(.debug))
+        XCTAssertFalse(Log.shouldLog(.verbose))
+        
+        ZeroKit.logLevel = .warning
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertTrue(Log.shouldLog(.error))
+        XCTAssertTrue(Log.shouldLog(.warning))
+        XCTAssertFalse(Log.shouldLog(.info))
+        XCTAssertFalse(Log.shouldLog(.debug))
+        XCTAssertFalse(Log.shouldLog(.verbose))
+        
+        ZeroKit.logLevel = .info
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertTrue(Log.shouldLog(.error))
+        XCTAssertTrue(Log.shouldLog(.warning))
+        XCTAssertTrue(Log.shouldLog(.info))
+        XCTAssertFalse(Log.shouldLog(.debug))
+        XCTAssertFalse(Log.shouldLog(.verbose))
+        
+        ZeroKit.logLevel = .debug
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertTrue(Log.shouldLog(.error))
+        XCTAssertTrue(Log.shouldLog(.warning))
+        XCTAssertTrue(Log.shouldLog(.info))
+        XCTAssertTrue(Log.shouldLog(.debug))
+        XCTAssertFalse(Log.shouldLog(.verbose))
+        
+        ZeroKit.logLevel = .verbose
+        
+        XCTAssertFalse(Log.shouldLog(.off))
+        XCTAssertTrue(Log.shouldLog(.error))
+        XCTAssertTrue(Log.shouldLog(.warning))
+        XCTAssertTrue(Log.shouldLog(.info))
+        XCTAssertTrue(Log.shouldLog(.debug))
+        XCTAssertTrue(Log.shouldLog(.verbose))
+    }
+    
     func testSha256() {
-        let result = Crypto.shared.sha256("63696361")
+        let result = Crypto().sha256("63696361")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "93cc4ad2a2102405c97fd2128f4e9e0cd704273373a11f7443a91850f7a57ce7"))
     }
     
     func testSha512() {
-        let result = Crypto.shared.sha512("63696361")
+        let result = Crypto().sha512("63696361")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "c8469bc870aa603214fe6ca003458dc70ce2e598f6363198840d1bbdd1cfd4af60d48704d7092b3b3960c13f72a2d468f3a524b25e98e10c6cb878fed9a870ce"))
@@ -29,7 +85,7 @@ class ZeroKitTests: XCTestCase {
     
     func testPbkdf2HmacSha256() {
         let size = 32
-        let result = Crypto.shared.pbkdf2HmacSha256("63696361", "00010203", 100000, size)
+        let result = Crypto().pbkdf2HmacSha256("63696361", "00010203", 100000, size)
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.length == size * 2)
@@ -38,7 +94,7 @@ class ZeroKitTests: XCTestCase {
     
     func testPbkdf2HmacSha512() {
         let size = 32
-        let result = Crypto.shared.pbkdf2HmacSha512("63696361", "00010203", 100000, size)
+        let result = Crypto().pbkdf2HmacSha512("63696361", "00010203", 100000, size)
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.length == size * 2)
@@ -46,7 +102,7 @@ class ZeroKitTests: XCTestCase {
     }
     
     func testHmacSha256() {
-        let result = Crypto.shared.hmacSha256("63696361", "00010203")
+        let result = Crypto().hmacSha256("63696361", "00010203")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "3cea206f6daa60f5cd3d6bde07ae9494ddfdf95c5f579a50c0bde6a4ac9c24bf"))
@@ -59,13 +115,13 @@ class ZeroKitTests: XCTestCase {
         let aad: NSString = "00010203"
         let tagLength = 16
         
-        let cipherText = Crypto.shared.aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
+        let cipherText = Crypto().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
         XCTAssertNotNil(cipherText)
         print(cipherText!)
         // CipherText + Tag
         XCTAssertTrue(cipherText!.isEqual(to: "bd341d4a643f7ccf35815d0e50756a8db6ba65e0e6a7991daa0d304cf49c54d6fbd1dc4b0e56745f"))
         
-        let plaintText = Crypto.shared.aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
+        let plaintText = Crypto().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
         XCTAssertNotNil(plaintText)
         print(plaintText!)
         XCTAssertTrue(plaintText!.isEqual(to: plainTextOriginal as String))
@@ -78,13 +134,13 @@ class ZeroKitTests: XCTestCase {
         let aad: NSString = "00010203"
         let tagLength = 16
         
-        let cipherText = Crypto.shared.aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
+        let cipherText = Crypto().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
         XCTAssertNotNil(cipherText)
         print(cipherText!)
         // CipherText + Tag
         XCTAssertTrue(cipherText!.isEqual(to: "1649250498fcd9c58ff957939a3ff9c1b4fe7e0dd1d88514d2a4be8ff4179febcf137e7a73d62473"))
         
-        let plaintText = Crypto.shared.aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
+        let plaintText = Crypto().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
         XCTAssertNotNil(plaintText)
         print(plaintText!)
         XCTAssertTrue(plaintText!.isEqual(to: plainTextOriginal as String))

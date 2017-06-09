@@ -9,6 +9,7 @@ class ZeroKitTestCaseBase: XCTestCase {
     override func setUp() {
         self.continueAfterFailure = false
         super.setUp()
+        ZeroKit.logLevel = .warning;
         resetZeroKit()
     }
     
