@@ -8,6 +8,7 @@
 ### Added
 - New error codes.
 - More descriptive error messages for developers. This includes descriptions and origin of errors.
+- You can now set the log level with `ZeroKit.logLevel`. Defaults to `warning`.
 
 ### Removed
 - Removed deprecated APIs: `ZeroKit.DidFailLoadingNotification`, `ZeroKit.DidLoadNotification`, `ZeroKit.isLoaded`.

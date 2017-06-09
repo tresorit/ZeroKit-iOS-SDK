@@ -62,6 +62,8 @@ Then, install it with the following command:
 $ pod install
 ```
 
+*Note: Pod installation may take a few minutes. The pod clones the ZeroKitClientNative crypto library and OpenSSL and builds these to link with the ZeroKit SDK.*
+
 ## Usage
 
 ### Initalizing ZeroKit
