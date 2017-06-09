@@ -259,7 +259,7 @@ class InternalApi: NSObject {
                 
                 completionCallback.call(withArguments: [httpResponse?.allHeaderFields ?? defaultHeaders,
                                                         httpResponse?.statusCode ?? defaultStatus,
-                                                        responseData ?? defaultData])
+                                                        (responseData as Any?) ?? defaultData])
             }
             
             task.resume()
