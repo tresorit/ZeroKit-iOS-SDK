@@ -23,6 +23,13 @@ public class ZeroKitConfig: NSObject, NSCopying {
     public var keychainAccessibility: CFString
     
     /**
+     The maximum number of queries submitted to ZeroKit that are executed concurrently.
+     
+     The default value is `1`.
+     */
+    public var concurrentQueryLimit = 1
+    
+    /**
      Initialize a configuration with your service URL. The URL is your tenant's URL.
      
      - parameter apiBaseUrl: Your service URL. You can find it on the ZeroKit management portal.

@@ -23,6 +23,8 @@ class InternalApi: NSObject {
     private var callbacks = [String: JsApiResultCallback]()
     private var apiLoadCompletions = [ErrorCallback]()
     private let queue = DispatchQueue(label: "com.tresorit.zerokit.internal", qos: .default, attributes: [])
+    private var queryQueue = [Query]()
+    private var executingQueryCount = 0
     
     init(with config: ZeroKitConfig) {
         self.config = config
@@ -31,18 +33,42 @@ class InternalApi: NSObject {
     }
     
     // MARK: API calls
+
+    private struct Query {
+        let methodOnObject: String
+        let parameters: [Any]
+        let callback: JsApiResultCallback
+    }
     
     func callMethod(_ methodOnObject: String, parameters: [Any], callback: @escaping JsApiResultCallback) {
-        loadApi { error in
-            if error != nil {
-                callback(false, JSValue(undefinedIn: self.context))
-            } else {
-                self.callMethodInner(methodOnObject, parameters: parameters, callback: callback)
+        let query = Query(methodOnObject: methodOnObject, parameters: parameters, callback: callback)
+        queryQueue.append(query)
+        executeNextQuery()
+    }
+    
+    private func executeNextQuery() {
+        if let query = self.queryQueue.first, executingQueryCount < self.config.concurrentQueryLimit {
+            executingQueryCount += 1
+            self.queryQueue.removeFirst()
+            let callback = query.callback
+            
+            let callbackWrapper: JsApiResultCallback = { [weak self] (success, result) in
+                self?.executingQueryCount -= 1
+                self?.executeNextQuery()
+                callback(success, result)
+            }
+            
+            loadApi { error in
+                if error != nil {
+                    callbackWrapper(false, JSValue(undefinedIn: self.context))
+                } else {
+                    self.callMethodInner(query.methodOnObject, parameters: query.parameters, callback: callbackWrapper)
+                }
             }
         }
     }
     
-    func callMethodInner(_ methodOnObject: String, parameters: [Any], callback: @escaping JsApiResultCallback) {
+    private func callMethodInner(_ methodOnObject: String, parameters: [Any], callback: @escaping JsApiResultCallback) {
         
         let callbackId = UUID().uuidString
         self.callbacks[callbackId] = callback
