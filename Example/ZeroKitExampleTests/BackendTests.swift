@@ -120,6 +120,9 @@ class BackendTests: ZeroKitTestCaseBase {
         let user = registerUser()
         loginUser(user)
         
+        let defaultProfile = getPublicProfileAsJson(for: user.id)
+        XCTAssertNil(defaultProfile)
+        
         let dict: ProfileJson = ["public": "profile",
                                  "id": user.id]
         

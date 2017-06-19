@@ -300,7 +300,7 @@ public class Backend: NSObject {
                 if let httpCode = (response as? HTTPURLResponse)?.statusCode, error == nil && 200 <= httpCode && httpCode < 300 {
                     
                     do {
-                        if let data = data {
+                        if let data = data, data.count > 0 {
                             let json = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])
                             completion(json, nil)
                             
