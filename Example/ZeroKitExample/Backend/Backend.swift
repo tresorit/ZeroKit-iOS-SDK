@@ -178,6 +178,28 @@ public class Backend: NSObject {
         }
     }
     
+    public func getPublicProfile(for userId: String, completion: @escaping (String?, Error?) -> Void) {
+        call(httpMethod: "GET",
+             path: "api/data/public-profile",
+             queryParams: ["id": userId],
+             body: nil,
+             needsAuth: true) { str, error in
+                
+                completion(str as? String, error)
+        }
+    }
+    
+    public func storePublicProfile(data: String, completion: @escaping (Error?) -> Void) {
+        call(httpMethod: "POST",
+             path: "api/data/public-profile",
+             queryParams: nil,
+             body: ["data": data],
+             needsAuth: true) { json, error in
+                
+                completion(error)
+        }
+    }
+    
     public func store(data: String, withId id: String, inTresor tresoriId: String, completion: @escaping (Error?) -> Void) {
         call(httpMethod: "POST",
              path: "api/data/store",
