@@ -1,4 +1,15 @@
 # Change Log
+## [4.1.2](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/4.1.2) - 2017-06-26
+### Added
+- `clear` method to `ZeroKitPasswordField`.
+
+### Changes
+- Improved data escaping performance during encryption and decryption.
+
+### Example App Changes
+- Added support for user public profile to the `Backend` class.
+- Turned off autocorrection in username text fields.
+
 ## [4.1.1](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/4.1.1) - 2017-04-05
 ### Fixed
 - Identity provider redirect URL when configured ZeroKit with a service URL ending with a slash or with deprecated `apiUrl` method.
