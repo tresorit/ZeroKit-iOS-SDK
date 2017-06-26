@@ -39,6 +39,40 @@ class BackendTests: ZeroKitTestCaseBase {
         return nil
     }
     
+    func setPublicProfile(json: ProfileJson) {
+        let data = try! JSONSerialization.data(withJSONObject: json, options: [])
+        let profile = String(data: data, encoding: .utf8)!
+        
+        let expectation = self.expectation(description: "Set public profile")
+        
+        zeroKitStack.backend.storePublicProfile(data: profile) { error in
+            XCTAssertNil(error)
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+    }
+    
+    func getPublicProfileAsJson(for userId: String) -> ProfileJson? {
+        var profile: String?
+        let expectation = self.expectation(description: "Get public profile")
+        
+        zeroKitStack.backend.getPublicProfile(for: userId) { aProfile, error in
+            XCTAssertNil(error)
+            profile = aProfile
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        if let profile = profile {
+            let json = try! JSONSerialization.jsonObject(with: profile.data(using: .utf8)!, options: [.allowFragments])
+            return (json as! ProfileJson)
+        }
+        
+        return nil
+    }
+    
     func store(data: String, withId: String, inTresor: String) {
         let expectation = self.expectation(description: "Store data")
         
@@ -80,6 +114,34 @@ class BackendTests: ZeroKitTestCaseBase {
         
         XCTAssertNotNil(dict2)
         XCTAssertTrue(NSDictionary(dictionary: dict).isEqual(to: dict2!))
+    }
+    
+    func testPublicProfile() {
+        let user = registerUser()
+        loginUser(user)
+        
+        let defaultProfile = getPublicProfileAsJson(for: user.id)
+        XCTAssertNil(defaultProfile)
+        
+        let dict: ProfileJson = ["public": "profile",
+                                 "id": user.id]
+        
+        setPublicProfile(json: dict)
+        let dict2 = getPublicProfileAsJson(for: user.id)
+        
+        XCTAssertNotNil(dict2)
+        XCTAssertTrue(NSDictionary(dictionary: dict).isEqual(to: dict2!))
+        
+        logout()
+        
+        // Fetch profile with other user
+        let user2 = registerUser()
+        loginUser(user2)
+        
+        let dict3 = getPublicProfileAsJson(for: user.id)
+        
+        XCTAssertNotNil(dict3)
+        XCTAssertTrue(NSDictionary(dictionary: dict).isEqual(to: dict3!))
     }
     
     func testDataStore() {
