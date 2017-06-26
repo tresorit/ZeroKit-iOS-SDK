@@ -59,8 +59,8 @@ class InternalApi: NSObject {
             }
             
             loadApi { error in
-                if error != nil {
-                    callbackWrapper(false, JSValue(undefinedIn: self.context))
+                if let error = error {
+                    callbackWrapper(false, JSValue(object: error, in: self.context))
                 } else {
                     self.callMethodInner(query.methodOnObject, parameters: query.parameters, callback: callbackWrapper)
                 }
@@ -130,7 +130,7 @@ class InternalApi: NSObject {
         
         switch newState {
         case .notLoaded:
-            let errorResult = error ?? NSError(ZeroKitError.unknownError)
+            let errorResult = error ?? NSError(ZeroKitError.apiLoadingError)
             Log.e("Error loading API: %@", errorResult)
             runApiLoadCompletions(error: error)
             

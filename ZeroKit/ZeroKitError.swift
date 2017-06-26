@@ -217,13 +217,21 @@ extension NSError {
         var info = [AnyHashable: Any]()
         var description: String?
         
-        if let error = result as? ZeroKitError {
-            code = error
-            info[NSUnderlyingErrorKey] = result as! NSError // Keep userInfo dictionary
-        } else if let error = result as? NSError {
-            info[NSUnderlyingErrorKey] = error
+        func handle(error: Error) {
+            if let zkError = error as? ZeroKitError {
+                code = zkError
+            }
+            info[NSUnderlyingErrorKey] = error as NSError
+        }
+        
+        if let error = result as? Error {
+            handle(error: error)
         } else if let value = result as? JSValue {
-            (code, description) = ZeroKitError.errorCodeFromJavascript(value)
+            if let error = value.toObject() as? Error {
+                handle(error: error)
+            } else {
+                (code, description) = ZeroKitError.errorCodeFromJavascript(value)
+            }
         } else if let value = result as? [AnyHashable: Any] {
             (code, description) = ZeroKitError.errorCodeFromDictionary(value)
         } else if let value = result as? String {
