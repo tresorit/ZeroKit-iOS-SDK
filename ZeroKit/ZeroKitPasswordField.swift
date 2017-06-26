@@ -131,6 +131,12 @@ public class ZeroKitPasswordField: UIView {
         return self.password == other.password
     }
     
+    /**
+     Clear the password field.
+     */
+    public func clear() {
+        self.textField.text = ""
+    }
     
     // MARK: Layout
     
