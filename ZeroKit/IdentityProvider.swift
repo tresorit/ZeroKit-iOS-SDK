@@ -53,7 +53,7 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         self.webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: webViewConfig)
         self.clientId = clientId
         self.config = config
-        self.redirectUrl = String(format: "%@://%@.%@/", config.apiBaseUrl.scheme!, clientId, config.apiBaseUrl.host!)
+        self.redirectUrl = String(format: "%@://%@.%@/", config.serviceUrl.scheme!, clientId, config.serviceUrl.host!)
         
         super.init()
         

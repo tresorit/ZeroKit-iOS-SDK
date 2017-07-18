@@ -28,10 +28,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let configDict = NSDictionary(contentsOf: configFile)!
         
         let clientId = configDict["ZeroKitClientId"] as! String
-        let apiUrl = URL(string: configDict["ZeroKitAPIBaseURL"] as! String)!
+        let serviceUrl = URL(string: configDict["ZeroKitServiceURL"] as! String)!
         let backendUrl = URL(string: configDict["ZeroKitAppBackend"] as! String)!
         
-        let config = ZeroKitConfig(apiBaseUrl: apiUrl)
+        let config = ZeroKitConfig(serviceUrl: serviceUrl)
         zeroKit = try! ZeroKit(config: config)
         
         backend = Backend(withBackendBaseUrl: backendUrl, authorizationCallback: { [weak self] credentialsCallback in

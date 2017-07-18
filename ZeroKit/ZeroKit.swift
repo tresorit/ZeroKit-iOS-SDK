@@ -613,6 +613,23 @@ public extension ZeroKit {
     }
     
     /**
+     Revoke an existing invitation link to a tresor.
+     
+     - parameter tresorId: The id of the tresor
+     - parameter secret: The secret is in the fragment identifier of the link url
+     - parameter completion: Called when the operation finished.
+     */
+    public func revokeInvitationLink(forTresor tresorId: String, secret: String, completion: @escaping OperationIdCompletion) {
+        self.internalApi.callMethod("cmd.api.revokeInvitationLink", parameters: [tresorId, secret]) { success, result in
+            if let opId = result as? String, success {
+                completion(opId, nil)
+            } else {
+                completion(nil, ZeroKitError.from(result).nserrorValue)
+            }
+        }
+    }
+    
+    /**
      Retrieves information about the link.
      
      - parameter secret: The secret is in the fragment identifier of the link url
@@ -692,34 +709,4 @@ public extension ZeroKit {
         }
         self.idpQuery?.cancelRequest()
     }
-}
-
-// MARK: deprecated
-
-public extension ZeroKit {
-    
-    /**
-     `true` if the SDK was successfully loaded, `false` otherwise.
-     */
-    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
-    public var isLoaded: Bool {
-        get { return self.internalApi.isLoaded }
-    }
-    
-    // MARK: Notifications
-    
-    /**
-     `DidLoadNotification` notification is posted when the SDK is successfully loaded. `ZeroKit.isLoaded` is also set to `true`.
-     */
-    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
-    public static let DidLoadNotification = DidLoadNotificationInner
-    internal static let DidLoadNotificationInner = Notification.Name("ZeroKit.DidLoadNotification")
-    
-    /**
-     `DidFailLoadingNotification` notification is posted when loading the SDK fails. `ZeroKit.isLoaded` is `false` if it fails.
-     */
-    @available(*, deprecated: 4.1.0, message: "You no longer need to wait for ZeroKit API to load, you can make calls instantly. API will be loaded in the background and retried if needed.")
-    public static let DidFailLoadingNotification = DidFailLoadingNotificationInner
-    internal static let DidFailLoadingNotificationInner = Notification.Name("ZeroKit.DidFailLoadingNotification")
-    
 }

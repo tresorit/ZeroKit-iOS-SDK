@@ -4,6 +4,13 @@
 
 #define kExpectationDefaultTimeout 90
 
+
+typedef void (^InvitationLinkCompletion)(InvitationLink * _Nullable, NSError * _Nullable);
+typedef void (^OperationIdCompletion)(NSString * _Nullable, NSError * _Nullable);
+typedef void (^LinkCreator)(NSURL * _Nonnull linkBaseUrl, NSString * _Nonnull tresorId, NSString * _Nonnull message, NSString * _Nullable password, InvitationLinkCompletion _Nonnull completion);
+typedef void (^LinkAccepter)(NSString * _Nonnull token, NSString * _Nullable password, OperationIdCompletion _Nonnull completion);
+
+
 @interface ObjcCompatibilityTests : XCTestCase
 @property (strong, nonatomic) ZeroKitStack *zeroKitStack;
 @end
@@ -24,11 +31,11 @@
     NSURL *configFile = [[NSBundle mainBundle] URLForResource:@"Config" withExtension:@"plist"];
     NSDictionary *configDict = [NSDictionary dictionaryWithContentsOfURL:configFile];
     
-    NSURL *apiURL = [NSURL URLWithString:configDict[@"ZeroKitAPIBaseURL"]];
+    NSURL *serviceURL = [NSURL URLWithString:configDict[@"ZeroKitServiceURL"]];
     NSString *clientID = configDict[@"ZeroKitClientId"];
     NSURL *backendURL = [NSURL URLWithString:configDict[@"ZeroKitAppBackend"]];
     
-    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiURL];
+    ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithServiceUrl:serviceURL];
     
     NSError *error = nil;
     ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
@@ -388,61 +395,42 @@
 }
 
 - (void)testInvitationLinkNoPassword {
-    TestUser *owner = [self registerUser];
-    TestUser *invitee = [self registerUser];
-    
-    [self loginUser:owner];
-    
-    NSString *tresorId = [self createTresor];
-    
-    NSURL *baseUrl = [NSURL URLWithString:@"https://tresorit.io/"];
-    NSString *message = @"This is the message";
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Creating link without password"];
-    
-    InvitationLink * __block link = nil;
-    
-    [self.zeroKitStack.zeroKit createInvitationLinkWithoutPasswordWith:baseUrl forTresor:tresorId withMessage:message completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
-        if (error) {
-            XCTFail(@"Failed to create invitation link without password: %@", error);
-        }
+    [self invitationLinkTesterWithCreator:^(NSURL * _Nonnull linkBaseUrl,
+                                            NSString * _Nonnull tresorId,
+                                            NSString * _Nonnull message,
+                                            NSString * _Nullable password,
+                                            InvitationLinkCompletion  _Nonnull completion) {
         
-        [self.zeroKitStack.backend createdInvitationLinkWithOperationId:aLink.id completion:^(NSError * _Nullable error) {
-            XCTAssertNil(error);
-            link = aLink;
-            [expectation fulfill];
-        }];
-    }];
-    
-    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
-    
-    [self logout];
-    
-    [self loginUser:invitee];
-    
-    InvitationLinkPublicInfo *info = [self infoForInvitationLink:link];
-    
-    XCTAssertTrue([info.creatorUserId isEqualToString:owner.id]);
-    XCTAssertTrue([info.message isEqualToString:message]);
-    XCTAssertFalse(info.isPasswordProtected);
-
-    expectation = [self expectationWithDescription:@"Accepting link without password"];
-    
-    [self.zeroKitStack.zeroKit acceptInvitationLinkWithoutPasswordWith:info.token completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
-        if (error) {
-            XCTFail(@"Failed to accept invitation link without password: %@", error);
-        }
+        [self.zeroKitStack.zeroKit createInvitationLinkWithoutPasswordWith:linkBaseUrl forTresor:tresorId withMessage:message completion:completion];
         
-        [self.zeroKitStack.backend acceptedInvitationLinkWithOperationId:operationId completion:^(NSError * _Nullable error) {
-            XCTAssertNil(error);
-            [expectation fulfill];
-        }];
+    } accepter:^(NSString * _Nonnull token,
+                 NSString * _Nullable password,
+                 OperationIdCompletion  _Nonnull completion) {
+        
+        [self.zeroKitStack.zeroKit acceptInvitationLinkWithoutPasswordWith:token completion:completion];
     }];
-    
-    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
 }
 
 - (void)testInvitationLink {
+    [self invitationLinkTesterWithCreator:^(NSURL * _Nonnull linkBaseUrl,
+                                            NSString * _Nonnull tresorId,
+                                            NSString * _Nonnull message,
+                                            NSString * _Nullable password,
+                                            InvitationLinkCompletion  _Nonnull completion) {
+        
+        [self.zeroKitStack.zeroKit createInvitationLinkWith:linkBaseUrl forTresor:tresorId withMessage:message password:password completion:completion];
+        
+    } accepter:^(NSString * _Nonnull token,
+                 NSString * _Nullable password,
+                 OperationIdCompletion  _Nonnull completion) {
+        
+        [self.zeroKitStack.zeroKit acceptInvitationLinkWith:token password:password completion:completion];
+    }];
+}
+
+- (void)invitationLinkTesterWithCreator:(LinkCreator)creator
+                               accepter:(LinkAccepter)accepter {
+    
     TestUser *owner = [self registerUser];
     TestUser *invitee = [self registerUser];
     
@@ -454,13 +442,13 @@
     NSString *message = @"This is the message";
     NSString *password = @"Password1.";
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Creating link without password"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Creating link"];
     
     InvitationLink * __block link = nil;
     
-    [self.zeroKitStack.zeroKit createInvitationLinkWith:baseUrl forTresor:tresorId withMessage:message password:password completion:^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
+    creator(baseUrl, tresorId, message, password, ^(InvitationLink * _Nullable aLink, NSError * _Nullable error) {
         if (error) {
-            XCTFail(@"Failed to create invitation link without password: %@", error);
+            XCTFail(@"Failed to create invitation link: %@", error);
         }
         
         [self.zeroKitStack.backend createdInvitationLinkWithOperationId:aLink.id completion:^(NSError * _Nullable error) {
@@ -468,7 +456,7 @@
             link = aLink;
             [expectation fulfill];
         }];
-    }];
+    });
     
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
     
@@ -480,22 +468,43 @@
     
     XCTAssertTrue([info.creatorUserId isEqualToString:owner.id]);
     XCTAssertTrue([info.message isEqualToString:message]);
-    XCTAssertTrue(info.isPasswordProtected);
     
-    expectation = [self expectationWithDescription:@"Accepting link without password"];
+    expectation = [self expectationWithDescription:@"Accepting link"];
     
-    [self.zeroKitStack.zeroKit acceptInvitationLinkWith:info.token password:password completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+    accepter(info.token, password, ^(NSString * _Nullable operationId, NSError * _Nullable error) {
         if (error) {
-            XCTFail(@"Failed to accept invitation link without password: %@", error);
+            XCTFail(@"Failed to accept invitation link: %@", error);
         }
         
         [self.zeroKitStack.backend acceptedInvitationLinkWithOperationId:operationId completion:^(NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
+    });
+    
+    [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
+    
+    [self logout];
+    
+    [self loginUser:owner];
+    
+    expectation = [self expectationWithDescription:@"Revoking link"];
+    
+    NSString *secret = link.url.fragment;
+    [self.zeroKitStack.zeroKit revokeInvitationLinkForTresor:tresorId secret:secret completion:^(NSString * _Nullable operationId, NSError * _Nullable error) {
+        if (error) {
+            XCTFail(@"Failed to revoke invitation link: %@", error);
+        }
+        
+        [self.zeroKitStack.backend revokedInvitationLinkWithOperationId:operationId completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
     }];
     
     [self waitForExpectationsWithTimeout:kExpectationDefaultTimeout handler:nil];
+    
+    [self logout];
 }
 
 - (void)testPasswordStrength {

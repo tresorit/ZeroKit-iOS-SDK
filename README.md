@@ -52,7 +52,7 @@ To integrate ZeroKit into your Xcode project using CocoaPods, specify it in your
 ```ruby
 target '<Your Target>' do
   use_frameworks!
-  pod 'ZeroKit', '~> 4.1'
+  pod 'ZeroKit', '~> 5.0'
 end
 ```
 
@@ -71,7 +71,7 @@ To initalize the SDK you will need your service URL. You can find your service U
 ```swift
 import ZeroKit
 
-let zeroKitConfig = ZeroKitConfig(apiBaseUrl: URL(string: "https://{TenantId}.api.tresorit.io")!)
+let zeroKitConfig = ZeroKitConfig(serviceUrl: URL(string: "https://{TenantId}.api.tresorit.io")!)
 let zeroKit = try! ZeroKit(config: zeroKitConfig)
 ```
 
@@ -79,8 +79,8 @@ let zeroKit = try! ZeroKit(config: zeroKitConfig)
 ```objc
 #import <ZeroKit/ZeroKit-Swift.h>
 
-NSURL *apiURL = [NSURL URLWithString:@"https://{TenantId}.api.tresorit.io"];
-ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithApiBaseUrl:apiURL];
+NSURL *serviceURL = [NSURL URLWithString:@"https://{TenantId}.api.tresorit.io"];
+ZeroKitConfig *config = [[ZeroKitConfig alloc] initWithServiceUrl:serviceURL];
 NSError *error = nil;
 ZeroKit *zeroKit = [[ZeroKit alloc] initWithConfig:config error:&error];
 ```
@@ -158,22 +158,26 @@ The example app requires a backend to function. We created a sample backend that
 
 #### Step 2 - Configure the iOS example app
 
-To use the example app you first have to set it up with your ZeroKit configuration. In the `ZeroKitExample/Config.plist` file set the values for `ZeroKitAPIBaseURL`, `ZeroKitClientId` and `ZeroKitAppBackend` keys. If this file does not exist then copy the sample `Config.sample.plist` file in the same directory to create one:
+To use the example app you first have to set it up with your ZeroKit configuration. Copy the sample `ZeroKitExample/Config.sample.plist` file and name it `Config.plist` in the same directory. In this `Config.plist` file set the values for the following keys:
+
+- `ZeroKitServiceURL`: This is your tenant's service URL. You can find this URL on the [management portal](https://manage.tresorit.io).
+- `ZeroKitClientId`: This is the client ID for your OpenID Connect client that you wish to use with your mobile. You can add new SDK clients and edit settings on the [management portal](https://manage.tresorit.io).
+- `ZeroKitAppBackend`: This is the URL of the sample application backend that you set up in **Step 1**.
+
+This is what the relevant section of the config file looks like:
 
 ```xml
-<key>ZeroKitAPIBaseURL</key>
-<string>{TenantBaseUrl}</string>
+<key>ZeroKitServiceURL</key>
+<string>{ServiceUrl}</string>
 <key>ZeroKitClientId</key>
 <string>{ClientId}</string>
 <key>ZeroKitAppBackend</key>
 <string>{AppBackendUrl}</string>
 ```
 
-- `ZeroKitAPIBaseURL`: This is your tenant's service URL. You can find this URL on the management portal.
-- `ZeroKitClientId`: This is the client ID for your OpenID Connect client that you wish to use with your mobile.
-- `ZeroKitAppBackend`: This is the URL of the sample application backend. You can find the sample backend and setup instructions [here](https://github.com/tresorit/ZeroKit-NodeJs-backend-sample).
+#### Step 3 - Test Drive
 
-Now you are ready to **Build and Run** (**⌘R**) the example in Xcode.
+Now you are ready to **Build and Run** (**⌘R**) the example app in Xcode.
 
 ### Registering Test Users
 
@@ -185,29 +189,30 @@ You can also take a look at the unit tests in this project to see further exampl
 
 ## Migration Guides
 
-### Migration to 4.1.0
+### Migration to 5.0.0 or later from 4.0.x or 4.1.x
 
 #### Initialization
 
-Since version 4.1.0 initializing ZeroKit with the API URL has been deprecated. You should initialize it with your API base URL (or your service URL) that you can find on your [management portal](https://manage.tresorit.io).
+Since version 5.0.0 configuring ZeroKit with the Service URL is the preferred method. You can find your service URL on your [management portal](https://manage.tresorit.io).
 
 ```swift
-// Since 4.1.0
+// Since 5.0.0
+let zeroKitConfig = ZeroKitConfig(serviceUrl: URL(string: "https://{TenantId}.api.tresorit.io")!)
+
+// Previously in 4.1.x, deprecated
 let zeroKitConfig = ZeroKitConfig(apiBaseUrl: URL(string: "https://{TenantId}.api.tresorit.io")!)
 
-// Previously in 4.0.x
+// Previously in 4.0.x, deprecated and removed
 let zeroKitConfig = ZeroKitConfig(apiUrl: URL(string: "https://host-{HostId}.api.tresorit.io/tenant-{TenantId}/static/v4/api.html")!)
 ```
 
-*Note: `ZeroKitConfig(apiUrl:)` is still available for backwards compatibilty but will be removed in a future version.*
+#### Notifications from 4.0.x
 
-#### Notifications
-
-In version 4.1.0 you no longer have to subscribe to `ZeroKit.DidLoadNotification` or `ZeroKit.DidFailLoadingNotification` notifications. You can start making ZeroKit calls right after initialization. The SDK will load the API internally and only after that will it handle your calls. This means you can just remove your observers for these notifications.
+Since version 4.1.0 you no longer have to subscribe to `ZeroKit.DidLoadNotification` or `ZeroKit.DidFailLoadingNotification` notifications. You can start making ZeroKit calls right after initialization. The SDK will load the API internally and only after that will it handle your calls. This means you can just remove your observers for these notifications.
 
 You will receive an error with `apiLoadingError` code in your callbacks if the API could not be loaded. In these cases the SDK will retry loading the API during subsequent calls.
 
-*Note: The notifications are still available for backwards compatibilty but will be removed in a future version.*
+Deprecated notifications are removed since 5.0.0.
 
 ## Known Issues and Limitations
 

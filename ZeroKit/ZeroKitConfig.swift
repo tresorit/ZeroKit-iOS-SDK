@@ -6,7 +6,7 @@ import UIKit
  Keychain configuration properties affect the storage of the "remember me" token.
  */
 public class ZeroKitConfig: NSObject, NSCopying {
-    let apiBaseUrl: URL
+    let serviceUrl: URL
     let apiUrl: URL
     let idpAuthUrl: URL
     
@@ -25,28 +25,27 @@ public class ZeroKitConfig: NSObject, NSCopying {
     /**
      Initialize a configuration with your service URL. The URL is your tenant's URL.
      
-     - parameter apiBaseUrl: Your service URL. You can find it on the ZeroKit management portal.
+     - parameter serviceUrl: Your service URL. You can find it on the ZeroKit management portal, https://manage.tresorit.io/.
      */
-    public init(apiBaseUrl: URL) {
-        self.apiBaseUrl = apiBaseUrl
-        self.apiUrl = apiBaseUrl.appendingPathComponent("static/v4/api.html")
-        self.idpAuthUrl = apiBaseUrl.appendingPathComponent("idp/connect/authorize")
+    public init(serviceUrl: URL) {
+        self.serviceUrl = serviceUrl
+        self.apiUrl = serviceUrl.appendingPathComponent("static/v5/api.html")
+        self.idpAuthUrl = serviceUrl.appendingPathComponent("idp/connect/authorize")
         self.keychainAccessibility = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
     }
     
     /**
-     Initialize a configuration with the API URL.
+     Initialize a configuration with your service URL (API base URL).
      
-     - parameter apiUrl: URL for the API
+     - parameter apiBaseUrl: Your service URL. You can find it on the ZeroKit management portal.
      */
-    @available(*, deprecated: 4.1.0, message: "Use init(apiBaseUrl: URL) instead")
-    public convenience init(apiUrl: URL) {
-        let apiBaseUrl = apiUrl.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-        self.init(apiBaseUrl: apiBaseUrl)
+    @available(*, deprecated: 5.0.0, message: "Use init(serviceUrl: URL) instead. This method has been renamed for consistency.")
+    public convenience init(apiBaseUrl: URL) {
+        self.init(serviceUrl: apiBaseUrl)
     }
     
     public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = ZeroKitConfig(apiBaseUrl: self.apiBaseUrl)
+        let copy = ZeroKitConfig(serviceUrl: self.serviceUrl)
         copy.keychainAccessGroup = self.keychainAccessGroup
         copy.keychainAccessibility = self.keychainAccessibility
         return copy

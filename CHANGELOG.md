@@ -1,4 +1,15 @@
 # Change Log
+## [5.0.0](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/5.0.0) - 2017-07-18
+### Changes
+- Use ZeroKit JavaScript API version 5.
+- `init(apiBaseUrl: URL)` on `ZeroKitConfig` has been deprecated in favor of `init(serviceUrl: URL)`. The value for the URL parameter is the same, it has been renamed for consistency.
+
+### Added
+- Invitation links can now be revoked using the `ZeroKit.revokeInvitationLink(forTresor:secret:completion:)` instance method.
+
+### Removed
+- Removed deprecated APIs: `ZeroKit.DidFailLoadingNotification`, `ZeroKit.DidLoadNotification`, `ZeroKit.isLoaded`, `ZeroKitConfig.init(apiUrl:)`.
+
 ## [4.1.2](https://github.com/tresorit/ZeroKit-iOS-SDK/releases/tag/4.1.2) - 2017-06-26
 ### Added
 - `clear` method to `ZeroKitPasswordField`.

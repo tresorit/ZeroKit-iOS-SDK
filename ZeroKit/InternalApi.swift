@@ -32,9 +32,6 @@ class InternalApi: NSObject {
     private weak var zeroKit: ZeroKit?
     
     let processPool = WKProcessPool()
-    var isLoaded: Bool {
-        get { return self.apiState == .didLoad }
-    }
     
     deinit {
         self.webView?.stopLoading()
@@ -168,14 +165,12 @@ class InternalApi: NSObject {
         
         switch newState {
         case .notLoaded:
-            NotificationCenter.default.post(name: ZeroKit.DidFailLoadingNotificationInner, object: zeroKit)
             runApiLoadCompletions(error: error ?? ZeroKitError.unknownError)
             
         case .loading:
             self.webView!.load(URLRequest(url: self.apiUrl))
             
         case .didLoad:
-            NotificationCenter.default.post(name: ZeroKit.DidLoadNotificationInner, object: zeroKit)
             runApiLoadCompletions()
         }
     }

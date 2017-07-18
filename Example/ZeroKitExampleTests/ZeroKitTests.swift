@@ -124,83 +124,46 @@ class ZeroKitTests: ZeroKitTestCaseBase {
     }
     
     func testInvitationLinkNoPassword() {
-        let user1 = registerUser()
-        let user2 = registerUser()
-        
-        loginUser(user1)
-        let tresorId = createTresor()
-        
-        let baseUrlStr = "https://tresorit.io/"
-        let message = "This is the message"
-        
-        var expectation = self.expectation(description: "Creating link without password")
-        
-        var link: InvitationLink?
-        
-        zeroKitStack.zeroKit.createInvitationLinkWithoutPassword(with: URL(string: baseUrlStr)!, forTresor: tresorId, withMessage: message) { aLink, error in
-            guard error == nil else {
-                XCTFail("Failed to create invitation link without password: \(error!)")
-                return
-            }
+        invitationLinkTester(creator: { (linkBaseUrl, tresorId, message, _, completion) in
+            zeroKitStack.zeroKit.createInvitationLinkWithoutPassword(with: linkBaseUrl, forTresor: tresorId, withMessage: message, completion: completion)
             
-            self.zeroKitStack.backend.createdInvitationLink(operationId: aLink!.id) { error in
-                XCTAssertTrue(error == nil)
-                link = aLink
-                expectation.fulfill()
-            }
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
-        
-        logout()
-        
-        loginUser(user2)
-        
-        let info = getInvitationLinkInfo(link!)
-        print("Link info: \(info)")
-        
-        XCTAssertTrue(info.creatorUserId == user1.id)
-        XCTAssertTrue(info.message! == message)
-        XCTAssertFalse(info.isPasswordProtected)
-        
-        expectation = self.expectation(description: "Accepting link without password")
-        
-        zeroKitStack.zeroKit.acceptInvitationLinkWithoutPassword(with: info.token) { operationId, error in
-            guard error == nil else {
-                XCTFail("Failed to accept invitation link without password: \(error!)")
-                return
-            }
-            
-            self.zeroKitStack.backend.acceptedInvitationLink(operationId: operationId!) { error in
-                XCTAssertTrue(error == nil)
-                expectation.fulfill()
-            }
-        }
-        
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        }, accepter: { (token, _, completion) in
+            zeroKitStack.zeroKit.acceptInvitationLinkWithoutPassword(with: token, completion: completion)
+        })
     }
     
     func testInvitationLink() {
+        invitationLinkTester(creator: { (linkBaseUrl, tresorId, message, password, completion) in
+            zeroKitStack.zeroKit.createInvitationLink(with: linkBaseUrl, forTresor: tresorId, withMessage: message, password: password, completion: completion)
+            
+        }, accepter: { (token, password, completion) in
+            zeroKitStack.zeroKit.acceptInvitationLink(with: token, password: password, completion: completion)
+        })
+    }
+    
+    func invitationLinkTester(creator: (URL, String, String, String, @escaping ZeroKit.InvitationLinkCompletion) -> Void,
+                              accepter: (String, String, @escaping ZeroKit.OperationIdCompletion) -> Void) {
         let user1 = registerUser()
         let user2 = registerUser()
         
         loginUser(user1)
         let tresorId = createTresor()
+        
+        // Create link
         
         let baseUrlStr = "https://tresorit.io/"
         let message = "This is the message"
         let password = "Password1."
         
-        var expectation = self.expectation(description: "Creating link with password")
-        
         var link: InvitationLink?
+        var expectation = self.expectation(description: "Creating link")
         
-        zeroKitStack.zeroKit.createInvitationLink(with: URL(string: baseUrlStr)!, forTresor: tresorId, withMessage: message, password: password) { aLink, error in
+        creator(URL(string: baseUrlStr)!, tresorId, message, password) { aLink, error in
             guard error == nil else {
-                XCTFail("Failed to create invitation link with password: \(error!)")
+                XCTFail("Failed to create invitation link: \(error!)")
                 return
             }
-            
+
             self.zeroKitStack.backend.createdInvitationLink(operationId: aLink!.id) { error in
                 XCTAssertTrue(error == nil)
                 link = aLink
@@ -219,13 +182,14 @@ class ZeroKitTests: ZeroKitTestCaseBase {
         
         XCTAssertTrue(info.creatorUserId == user1.id)
         XCTAssertTrue(info.message! == message)
-        XCTAssertTrue(info.isPasswordProtected)
         
-        expectation = self.expectation(description: "Accepting link with password")
+        // Accept link
         
-        zeroKitStack.zeroKit.acceptInvitationLink(with: info.token, password: password) { operationId, error in
+        expectation = self.expectation(description: "Accepting link")
+        
+        accepter(info.token, password) { operationId, error in
             guard error == nil else {
-                XCTFail("Failed to accept invitation link with password: \(error!)")
+                XCTFail("Failed to accept invitation link: \(error!)")
                 return
             }
             
@@ -236,6 +200,31 @@ class ZeroKitTests: ZeroKitTestCaseBase {
         }
         
         waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        logout()
+        
+        loginUser(user1)
+        
+        // Revoke link
+        
+        expectation = self.expectation(description: "Revoking link")
+        
+        let secret = link!.url.fragment!
+        zeroKitStack.zeroKit.revokeInvitationLink(forTresor: tresorId, secret: secret) { operationId, error in
+            guard error == nil else {
+                XCTFail("Failed to revoke invitation link: \(error!)")
+                return
+            }
+            
+            self.zeroKitStack.backend.revokedInvitationLink(operationId: operationId!) { error in
+                XCTAssertTrue(error == nil)
+                expectation.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        
+        logout()
     }
     
     func testTwoSimultaneousUsers() {

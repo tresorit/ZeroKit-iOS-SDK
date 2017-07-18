@@ -147,13 +147,36 @@ public class Backend: NSObject {
     }
     
     public func createdInvitationLink(operationId: String, completion: @escaping (Error?) -> Void) {
-        // TODO: approve link creation
-        completion(BackendError.notImplemented)
+        call(httpMethod: "POST",
+             path: "api/invitationLinks/created",
+             queryParams: nil,
+             body: ["operationId": operationId],
+             needsAuth: true) { json, error in
+                
+                completion(error)
+        }
     }
     
     public func acceptedInvitationLink(operationId: String, completion: @escaping (Error?) -> Void) {
-        // TODO: approve link acceptence
-        completion(BackendError.notImplemented)
+        call(httpMethod: "POST",
+             path: "api/invitationLinks/accepted",
+             queryParams: nil,
+             body: ["operationId": operationId],
+             needsAuth: true) { json, error in
+                
+                completion(error)
+        }
+    }
+    
+    public func revokedInvitationLink(operationId: String, completion: @escaping (Error?) -> Void) {
+        call(httpMethod: "POST",
+             path: "api/invitationLinks/revoked",
+             queryParams: nil,
+             body: ["operationId": operationId],
+             needsAuth: true) { json, error in
+                
+                completion(error)
+        }
     }
     
     public func getProfile(completion: @escaping (String?, Error?) -> Void) {
