@@ -70,14 +70,14 @@ class ZeroKitTests: XCTestCase {
     }
     
     func testSha256() {
-        let result = Crypto().sha256("63696361")
+        let result = CryptoJs().sha256("63696361")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "93cc4ad2a2102405c97fd2128f4e9e0cd704273373a11f7443a91850f7a57ce7"))
     }
     
     func testSha512() {
-        let result = Crypto().sha512("63696361")
+        let result = CryptoJs().sha512("63696361")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "c8469bc870aa603214fe6ca003458dc70ce2e598f6363198840d1bbdd1cfd4af60d48704d7092b3b3960c13f72a2d468f3a524b25e98e10c6cb878fed9a870ce"))
@@ -85,7 +85,7 @@ class ZeroKitTests: XCTestCase {
     
     func testPbkdf2HmacSha256() {
         let size = 32
-        let result = Crypto().pbkdf2HmacSha256("63696361", "00010203", 100000, size)
+        let result = CryptoJs().pbkdf2HmacSha256("63696361", "00010203", 100000, size)
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.length == size * 2)
@@ -94,7 +94,7 @@ class ZeroKitTests: XCTestCase {
     
     func testPbkdf2HmacSha512() {
         let size = 32
-        let result = Crypto().pbkdf2HmacSha512("63696361", "00010203", 100000, size)
+        let result = CryptoJs().pbkdf2HmacSha512("63696361", "00010203", 100000, size)
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.length == size * 2)
@@ -102,7 +102,7 @@ class ZeroKitTests: XCTestCase {
     }
     
     func testHmacSha256() {
-        let result = Crypto().hmacSha256("63696361", "00010203")
+        let result = CryptoJs().hmacSha256("63696361", "00010203")
         XCTAssertNotNil(result)
         print(result!)
         XCTAssertTrue(result!.isEqual(to: "3cea206f6daa60f5cd3d6bde07ae9494ddfdf95c5f579a50c0bde6a4ac9c24bf"))
@@ -115,13 +115,13 @@ class ZeroKitTests: XCTestCase {
         let aad: NSString = "00010203"
         let tagLength = 16
         
-        let cipherText = Crypto().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
+        let cipherText = CryptoJs().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
         XCTAssertNotNil(cipherText)
         print(cipherText!)
         // CipherText + Tag
         XCTAssertTrue(cipherText!.isEqual(to: "bd341d4a643f7ccf35815d0e50756a8db6ba65e0e6a7991daa0d304cf49c54d6fbd1dc4b0e56745f"))
         
-        let plaintText = Crypto().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
+        let plaintText = CryptoJs().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
         XCTAssertNotNil(plaintText)
         print(plaintText!)
         XCTAssertTrue(plaintText!.isEqual(to: plainTextOriginal as String))
@@ -134,15 +134,49 @@ class ZeroKitTests: XCTestCase {
         let aad: NSString = "00010203"
         let tagLength = 16
         
-        let cipherText = Crypto().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
+        let cipherText = CryptoJs().aesGcmEncrypt(plainTextOriginal, key, iv, aad, tagLength)
         XCTAssertNotNil(cipherText)
         print(cipherText!)
         // CipherText + Tag
         XCTAssertTrue(cipherText!.isEqual(to: "1649250498fcd9c58ff957939a3ff9c1b4fe7e0dd1d88514d2a4be8ff4179febcf137e7a73d62473"))
         
-        let plaintText = Crypto().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
+        let plaintText = CryptoJs().aesGcmDecrypt(cipherText!, key, iv, aad, tagLength)
         XCTAssertNotNil(plaintText)
         print(plaintText!)
         XCTAssertTrue(plaintText!.isEqual(to: plainTextOriginal as String))
+    }
+    
+    func testAes128GcmRaw() {
+        let plainDataOriginal = Data(base64Encoded: "Y2ljYWNpY2FjaWNhY2ljYWNpY2FjaWNh")!
+        let key = Data(base64Encoded: "k8xK0qIQJAXJf9ISj06eDA==")!
+        let iv = Data(base64Encoded: "uavdfk+X+c08Q8cvDUXhDg==")!
+        let aad = Data(base64Encoded: "AAECAw==")!
+        let tagLength = 16
+        
+        let cipherData = Crypto.aesGcmEncrypt(plainData: plainDataOriginal, key: key, iv: iv, adata: aad, tagLength: tagLength)
+        XCTAssertNotNil(cipherData)
+        // CipherText + Tag
+        XCTAssertTrue(cipherData! == Data(base64Encoded: "vTQdSmQ/fM81gV0OUHVqjba6ZeDmp5kdqg0wTPScVNb70dxLDlZ0Xw=="))
+        
+        let plaintData = Crypto.aesGcmDecrypt(cipherData: cipherData!, key: key, iv: iv, adata: aad, tagLength: tagLength)
+        XCTAssertNotNil(plaintData)
+        XCTAssertTrue(plaintData == plainDataOriginal)
+    }
+    
+    func testAes256GcmRaw() {
+        let plainDataOriginal = Data(base64Encoded: "Y2ljYWNpY2FjaWNhY2ljYWNpY2FjaWNh")!
+        let key = Data(base64Encoded: "k8xK0qIQJAXJf9ISj06eDNcEJzNzoR90Q6kYUPelfOc=")!
+        let iv = Data(base64Encoded: "uavdfk+X+c08Q8cvDUXhDg==")!
+        let aad = Data(base64Encoded: "AAECAw==")!
+        let tagLength = 16
+        
+        let cipherData = Crypto.aesGcmEncrypt(plainData: plainDataOriginal, key: key, iv: iv, adata: aad, tagLength: tagLength)
+        XCTAssertNotNil(cipherData)
+        // CipherText + Tag
+        XCTAssertTrue(cipherData! == Data(base64Encoded: "FkklBJj82cWP+VeTmj/5wbT+fg3R2IUU0qS+j/QXn+vPE356c9Ykcw=="))
+        
+        let plaintData = Crypto.aesGcmDecrypt(cipherData: cipherData!, key: key, iv: iv, adata: aad, tagLength: tagLength)
+        XCTAssertNotNil(plaintData)
+        XCTAssertTrue(plaintData == plainDataOriginal)
     }
 }

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		E7180D321E5DB9A10091482F /* ZeroKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7180D311E5DB9A10091482F /* ZeroKitConfig.swift */; };
 		E71BA04B1EC19AC8006B498F /* Srp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71BA04A1EC19AC8006B498F /* Srp.swift */; };
+		E71E4AEF1F0BCBB600FD334E /* Leb128Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71E4AEE1F0BCBB600FD334E /* Leb128Data.swift */; };
+		E71E4AF11F0BD04000FD334E /* LEB128.swift in Sources */ = {isa = PBXBuildFile; fileRef = E71E4AF01F0BD04000FD334E /* LEB128.swift */; };
+		E7222B371F029982007F593F /* CipherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7222B361F029982007F593F /* CipherData.swift */; };
 		E72DFF8B1EDC3AB60004BE9A /* ZeroKitInit.js in Resources */ = {isa = PBXBuildFile; fileRef = E72DFF8A1EDC3AB60004BE9A /* ZeroKitInit.js */; };
 		E72DFF8D1EDC69970004BE9A /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72DFF8C1EDC69970004BE9A /* Log.swift */; };
 		E7429DDE1E5B04DB0006BC2A /* CryptoSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = E7429DDC1E5B04DB0006BC2A /* CryptoSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -17,13 +20,18 @@
 		E762F06D1D9C199E00170D9F /* ZeroKit.js in Resources */ = {isa = PBXBuildFile; fileRef = E762F06B1D9C199E00170D9F /* ZeroKit.js */; };
 		E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E762F06C1D9C199E00170D9F /* ZeroKit.swift */; };
 		E78C1AF11E56F72F003E4B63 /* IdentityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */; };
+		E7AA29411F0BABAB006D1A33 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AA29401F0BABAB006D1A33 /* Crypto.swift */; };
 		E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */; };
-		E7C57F3B1EBC94DE00F145DD /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F4F4C21EBC61DE00DE9FC1 /* Crypto.swift */; };
+		E7C57F3B1EBC94DE00F145DD /* CryptoJs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F4F4C21EBC61DE00DE9FC1 /* CryptoJs.swift */; };
 		E7C57F431EC071C000F145DD /* ZeroKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C57F421EC071C000F145DD /* ZeroKitTests.swift */; };
 		E7C57F451EC071C000F145DD /* ZeroKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E762F0601D9C193500170D9F /* ZeroKit.framework */; };
 		E7CF83711EAF8D480017F7F3 /* InternalApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF83701EAF8D480017F7F3 /* InternalApi.swift */; };
 		E7CF83791EAF8EE30017F7F3 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF83771EAF8EE30017F7F3 /* Storage.swift */; };
 		E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */; };
+		E7EFF2F31F222D18000CE9A3 /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7EFF2F21F222D18000CE9A3 /* Random.swift */; };
+		E7EFF2F91F233E02000CE9A3 /* ApiJs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7EFF2F81F233E02000CE9A3 /* ApiJs.swift */; };
+		E7EFF3001F234B7F000CE9A3 /* jsCoreFormatWrapper.js in Resources */ = {isa = PBXBuildFile; fileRef = E7EFF2FF1F234B7F000CE9A3 /* jsCoreFormatWrapper.js */; };
+		E7EFF31F1F2365C1000CE9A3 /* ZeroKitInitFormat.js in Resources */ = {isa = PBXBuildFile; fileRef = E7EFF31E1F2365C1000CE9A3 /* ZeroKitInitFormat.js */; };
 		E7F4F48A1EB9CCDF00DE9FC1 /* IDP.js in Resources */ = {isa = PBXBuildFile; fileRef = E7F4F4891EB9CCDF00DE9FC1 /* IDP.js */; };
 		E7F4F48D1EBA397700DE9FC1 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F4F48C1EBA397700DE9FC1 /* Synchronized.swift */; };
 		E7F4F4B91EBB4C9B00DE9FC1 /* ZeroKitClientNative.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F4F4B81EBB4C9B00DE9FC1 /* ZeroKitClientNative.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -51,6 +59,9 @@
 /* Begin PBXFileReference section */
 		E7180D311E5DB9A10091482F /* ZeroKitConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitConfig.swift; sourceTree = "<group>"; };
 		E71BA04A1EC19AC8006B498F /* Srp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Srp.swift; sourceTree = "<group>"; };
+		E71E4AEE1F0BCBB600FD334E /* Leb128Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Leb128Data.swift; sourceTree = "<group>"; };
+		E71E4AF01F0BD04000FD334E /* LEB128.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LEB128.swift; sourceTree = "<group>"; };
+		E7222B361F029982007F593F /* CipherData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CipherData.swift; sourceTree = "<group>"; };
 		E72DFF8A1EDC3AB60004BE9A /* ZeroKitInit.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ZeroKitInit.js; sourceTree = "<group>"; };
 		E72DFF8C1EDC69970004BE9A /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E7429DDC1E5B04DB0006BC2A /* CryptoSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CryptoSupport.h; sourceTree = "<group>"; };
@@ -61,6 +72,7 @@
 		E762F06B1D9C199E00170D9F /* ZeroKit.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ZeroKit.js; sourceTree = "<group>"; };
 		E762F06C1D9C199E00170D9F /* ZeroKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKit.swift; sourceTree = "<group>"; };
 		E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityProvider.swift; sourceTree = "<group>"; };
+		E7AA29401F0BABAB006D1A33 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		E7BE6B5F1E83C2C0001A4E78 /* PasswordStrength.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordStrength.swift; sourceTree = "<group>"; };
 		E7C57F401EC071C000F145DD /* ZeroKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZeroKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7C57F421EC071C000F145DD /* ZeroKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZeroKitTests.swift; sourceTree = "<group>"; };
@@ -68,12 +80,16 @@
 		E7CF83701EAF8D480017F7F3 /* InternalApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InternalApi.swift; path = ZeroKit/Internal/InternalApi.swift; sourceTree = SOURCE_ROOT; };
 		E7CF83771EAF8EE30017F7F3 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		E7DBFE3B1E0A69B9007321CC /* ZeroKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitError.swift; sourceTree = "<group>"; };
+		E7EFF2F21F222D18000CE9A3 /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
+		E7EFF2F81F233E02000CE9A3 /* ApiJs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiJs.swift; sourceTree = "<group>"; };
+		E7EFF2FF1F234B7F000CE9A3 /* jsCoreFormatWrapper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = jsCoreFormatWrapper.js; sourceTree = "<group>"; };
+		E7EFF31E1F2365C1000CE9A3 /* ZeroKitInitFormat.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ZeroKitInitFormat.js; sourceTree = "<group>"; };
 		E7F4F4891EB9CCDF00DE9FC1 /* IDP.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = IDP.js; sourceTree = "<group>"; };
 		E7F4F48C1EBA397700DE9FC1 /* Synchronized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
 		E7F4F4B71EBB475C00DE9FC1 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		E7F4F4B81EBB4C9B00DE9FC1 /* ZeroKitClientNative.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZeroKitClientNative.h; path = ZeroKitNative/ZeroKitClientNative.h; sourceTree = SOURCE_ROOT; };
 		E7F4F4BB1EBB4D2800DE9FC1 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		E7F4F4C21EBC61DE00DE9FC1 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		E7F4F4C21EBC61DE00DE9FC1 /* CryptoJs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoJs.swift; sourceTree = "<group>"; };
 		E7F661501E00427F007D60A8 /* ZeroKitPasswordField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZeroKitPasswordField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,8 +171,9 @@
 		E7CF83721EAF8E400017F7F3 /* JavascriptSupport */ = {
 			isa = PBXGroup;
 			children = (
+				E7EFF2FE1F2348F1000CE9A3 /* Testing */,
 				E7F4F4891EB9CCDF00DE9FC1 /* IDP.js */,
-				E7F4F4C21EBC61DE00DE9FC1 /* Crypto.swift */,
+				E7F4F4C21EBC61DE00DE9FC1 /* CryptoJs.swift */,
 				E71BA04A1EC19AC8006B498F /* Srp.swift */,
 				E7CF83771EAF8EE30017F7F3 /* Storage.swift */,
 				E762F06B1D9C199E00170D9F /* ZeroKit.js */,
@@ -168,19 +185,34 @@
 		E7CF83731EAF8E750017F7F3 /* Internal */ = {
 			isa = PBXGroup;
 			children = (
-				E7F4F48B1EBA394E00DE9FC1 /* Utils */,
+				E7EFF2F81F233E02000CE9A3 /* ApiJs.swift */,
+				E7222B361F029982007F593F /* CipherData.swift */,
+				E7AA29401F0BABAB006D1A33 /* Crypto.swift */,
 				E78C1AF01E56F72F003E4B63 /* IdentityProvider.swift */,
 				E7CF83701EAF8D480017F7F3 /* InternalApi.swift */,
 				E7CF83721EAF8E400017F7F3 /* JavascriptSupport */,
+				E7EFF2F21F222D18000CE9A3 /* Random.swift */,
+				E7F4F48B1EBA394E00DE9FC1 /* Utils */,
 			);
 			path = Internal;
+			sourceTree = "<group>";
+		};
+		E7EFF2FE1F2348F1000CE9A3 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				E7EFF2FF1F234B7F000CE9A3 /* jsCoreFormatWrapper.js */,
+				E7EFF31E1F2365C1000CE9A3 /* ZeroKitInitFormat.js */,
+			);
+			path = Testing;
 			sourceTree = "<group>";
 		};
 		E7F4F48B1EBA394E00DE9FC1 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				E7F4F48C1EBA397700DE9FC1 /* Synchronized.swift */,
+				E71E4AF01F0BD04000FD334E /* LEB128.swift */,
+				E71E4AEE1F0BCBB600FD334E /* Leb128Data.swift */,
 				E72DFF8C1EDC69970004BE9A /* Log.swift */,
+				E7F4F48C1EBA397700DE9FC1 /* Synchronized.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -314,7 +346,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E72DFF8B1EDC3AB60004BE9A /* ZeroKitInit.js in Resources */,
+				E7EFF3001F234B7F000CE9A3 /* jsCoreFormatWrapper.js in Resources */,
 				E7F4F48A1EB9CCDF00DE9FC1 /* IDP.js in Resources */,
+				E7EFF31F1F2365C1000CE9A3 /* ZeroKitInitFormat.js in Resources */,
 				E762F06D1D9C199E00170D9F /* ZeroKit.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,15 +371,21 @@
 				E7CF83711EAF8D480017F7F3 /* InternalApi.swift in Sources */,
 				E72DFF8D1EDC69970004BE9A /* Log.swift in Sources */,
 				E78C1AF11E56F72F003E4B63 /* IdentityProvider.swift in Sources */,
+				E7AA29411F0BABAB006D1A33 /* Crypto.swift in Sources */,
 				E7DBFE3C1E0A69B9007321CC /* ZeroKitError.swift in Sources */,
 				E7F4F48D1EBA397700DE9FC1 /* Synchronized.swift in Sources */,
 				E71BA04B1EC19AC8006B498F /* Srp.swift in Sources */,
+				E7EFF2F31F222D18000CE9A3 /* Random.swift in Sources */,
 				E7CF83791EAF8EE30017F7F3 /* Storage.swift in Sources */,
+				E71E4AEF1F0BCBB600FD334E /* Leb128Data.swift in Sources */,
+				E71E4AF11F0BD04000FD334E /* LEB128.swift in Sources */,
 				E7F661511E00427F007D60A8 /* ZeroKitPasswordField.swift in Sources */,
 				E7429DDF1E5B04DB0006BC2A /* CryptoSupport.m in Sources */,
+				E7EFF2F91F233E02000CE9A3 /* ApiJs.swift in Sources */,
+				E7222B371F029982007F593F /* CipherData.swift in Sources */,
 				E762F06E1D9C199E00170D9F /* ZeroKit.swift in Sources */,
 				E7BE6B601E83C2C0001A4E78 /* PasswordStrength.swift in Sources */,
-				E7C57F3B1EBC94DE00F145DD /* Crypto.swift in Sources */,
+				E7C57F3B1EBC94DE00F145DD /* CryptoJs.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

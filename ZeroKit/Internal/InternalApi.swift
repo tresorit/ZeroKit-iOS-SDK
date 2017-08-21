@@ -16,8 +16,8 @@ class InternalApi: NSObject {
     let localStorage = MapStorage()
     let sessionStorage = MapStorage()
     let persistenceKeys = PersistenceKeys()
-    let srp = Srp()
-    private var context: JSContext!
+    private let srp = Srp()
+    private var context = JSContext()!
     private let urlSession = URLSession(configuration: URLSessionConfiguration.default)
     private var apiState = ApiState.notLoaded
     private var callbacks = [String: JsApiResultCallback]()
@@ -27,6 +27,7 @@ class InternalApi: NSObject {
     init(with config: ZeroKitConfig) {
         self.config = config
         super.init()
+        setupContext()
         loadApi { _ in }
     }
     
@@ -66,10 +67,6 @@ class InternalApi: NSObject {
             let function = self.context.evaluateScript("ios_callApiMethod")!
             _ = function.call(withArguments: [object, method, callbackId, jsParams])
         }
-    }
-    
-    func freeSrpMemory() {
-        self.srp.cleanUpClients()
     }
     
     func zxcvbn(password: String, completion: @escaping (JSValue) -> Void) {
@@ -128,14 +125,12 @@ class InternalApi: NSObject {
     
     private func loadJs(completion: @escaping ErrorCallback) {
         queue.async {
-            self.setupContext()
-            
             var outError: NSError?
             
             do {
-                for url in self.config.apiJsUrls {
-                    let js = try String(contentsOf: url)
-                    self.context.evaluateScript(js, withSourceURL: url)
+                for apiJs in self.config.apiJs {
+                    let js = try apiJs.javascript()
+                    self.context.evaluateScript(js, withSourceURL: apiJs.sourceUrl)
                 }
             } catch {
                 outError = NSError(error, defaultErrorCode: .apiLoadingError)
@@ -154,13 +149,13 @@ class InternalApi: NSObject {
     }
     
     private func setupContext() {
-        if context != nil {
-            return
+        self.context.name = "ZeroKit JSContext"
+        queue.async {
+            self.setupContextInner()
         }
-        
-        context = JSContext()!
-        context.name = "ZeroKit JSContext"
-        
+    }
+    
+    private func setupContextInner() {
         context.exceptionHandler = { [weak self] (context: JSContext?, exception: JSValue?) -> Void in
             if let exception = exception {
                 Log.e("Javascript Exception: %@, %@", exception.toString()!, exception.toObject()! as! CVarArg)
@@ -269,14 +264,14 @@ class InternalApi: NSObject {
         context.setObject(localStorage, forKeyedSubscript: "mockLocalStorage" as NSString)
         context.setObject(sessionStorage, forKeyedSubscript: "mockSessionStorage" as NSString)
         context.setObject(persistenceKeys, forKeyedSubscript: "mockPersistenceKeys" as NSString)
-        context.setObject(Crypto(), forKeyedSubscript: "iosCrypto" as NSString)
+        context.setObject(CryptoJs(), forKeyedSubscript: "iosCrypto" as NSString)
         context.setObject(srp, forKeyedSubscript: "iosSrp" as NSString)
     }
     
     private func setBaseUrl(completion: @escaping ErrorCallback) {
         queue.async {
             let function = self.context.evaluateScript("mobileCommands.setBaseURL")!
-            let result = function.call(withArguments: [self.config.apiBaseUrl.absoluteString])
+            let result = function.call(withArguments: [self.config.serviceUrl.absoluteString])
             
             Log.v("Set base url: %@", result?.toObject() as? CVarArg ?? "Unexpected value")
             
@@ -284,5 +279,9 @@ class InternalApi: NSObject {
                 completion(nil)
             }
         }
+    }
+    
+    func jsRandomProvider() -> JsRandomProvider {
+        return JsRandomProvider(context: self.context, function: "ios_mockCryptoB64")
     }
 }

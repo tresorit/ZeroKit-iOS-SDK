@@ -36,6 +36,7 @@ public class ZeroKitIdentityTokens: NSObject {
 class IdentityProvider: NSObject, WKNavigationDelegate {
     private let webView: WKWebView
     private let internalApi: InternalApi
+    private let randomProvider: RandomProvider
     
     private let clientId: String
     private let redirectUrl: String
@@ -57,7 +58,7 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         }
     }
     
-    init(clientId: String, internalApi: InternalApi, webviewHostView: UIView) {
+    init(clientId: String, internalApi: InternalApi, webviewHostView: UIView, randomProvider: RandomProvider) {
         
         let scriptJsUrl = Bundle(for: IdentityProvider.classForCoder()).url(forResource: "IDP", withExtension: "js")!
         let scriptJs = try! String(contentsOf: scriptJsUrl)
@@ -72,9 +73,10 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         self.webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: webViewConfig)
         self.clientId = clientId
         
-        let serviceUrl = internalApi.config.apiBaseUrl
+        let serviceUrl = internalApi.config.serviceUrl
         self.redirectUrl = String(format: "%@://%@.%@/", serviceUrl.scheme!, clientId, serviceUrl.host!)
         self.internalApi = internalApi
+        self.randomProvider = randomProvider
         
         super.init()
         
@@ -87,12 +89,12 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         self.useProofKey = useProofKey
         
         // Load page for service URL. Only after that can we set the cookies.
-        webView.loadHTMLString("", baseURL: internalApi.config.apiBaseUrl)
+        webView.loadHTMLString("", baseURL: internalApi.config.serviceUrl)
     }
     
     private func setCookiesAndData() {
         let parameters: [Any] = [
-            internalApi.persistenceKeys.cookies(for: internalApi.config.apiBaseUrl.host!),
+            internalApi.persistenceKeys.cookies(for: internalApi.config.serviceUrl.host!),
             internalApi.localStorage.allItems().map { [$0, $1] },
             internalApi.sessionStorage.allItems().map { [$0, $1] }
         ]
@@ -116,7 +118,7 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
         }
         
         do {
-            self.state = try IdentityProvider.generateCode()
+            self.state = try generateCode()
             
             var params = [String: String]()
             params["client_id"] = self.clientId
@@ -124,12 +126,12 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
             params["response_type"] = "code id_token"
             params["scope"] = "openid profile"
             params["state"] = self.state
-            params["nonce"] = try IdentityProvider.generateCode()
+            params["nonce"] = try generateCode()
             params["response_mode"] = "fragment"
             params["prompt"] = "none"
             
             if useProofKey {
-                self.codeVerifier = try IdentityProvider.generateCode()
+                self.codeVerifier = try generateCode()
                 params["code_challenge"] = ZeroKitUrlSafeBase64Encode(ZeroKitSha256(self.codeVerifier!.data(using: .utf8)!)!)
                 params["code_challenge_method"] = "S256"
             }
@@ -154,41 +156,15 @@ class IdentityProvider: NSObject, WKNavigationDelegate {
     
     // MARK: Code challenge
     
-    private class func generateCode() throws -> String {
+    private func generateCode() throws -> String {
         let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".characters
         var code = ""
         for _ in 0..<64 {
-            let random = try Int(secureRandom32(max: UInt32(chars.count-1)))
-            let index = chars.index(chars.startIndex, offsetBy: random)
+            let random = try self.randomProvider.randomUInt32(max: UInt32(chars.count-1))
+            let index = chars.index(chars.startIndex, offsetBy: Int(random))
             code.append(chars[index])
         }
         return code
-    }
-    
-    private class func secureRandom32(max: UInt32) throws -> UInt32 {
-        if max == UInt32.max {
-            return try secureRandom32()
-        }
-        
-        let maxp1 = max + 1
-        var r: UInt32 = 0
-        
-        repeat {
-            r = try secureRandom32()
-        } while r <= (UInt32.max % maxp1)
-        
-        return r % maxp1
-    }
-    
-    private class func secureRandom32() throws -> UInt32 {
-        var data = Data(count: 4)
-        let result = data.withUnsafeMutableBytes { (mutableBytes: UnsafeMutablePointer<UInt8>) -> Int32 in
-            return SecRandomCopyBytes(kSecRandomDefault, data.count, mutableBytes)
-        }
-        if result != errSecSuccess {
-            throw NSError(ZeroKitError.internalError, message: String(format: "Error getting random bytes, result: %d.", result))
-        }
-        return (UInt32(data[0]) << 24) | (UInt32(data[1]) << 16) | (UInt32(data[2]) << 8) | UInt32(data[3]);
     }
     
     // MARK: WKNavigationDelegate

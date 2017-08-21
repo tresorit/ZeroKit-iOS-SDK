@@ -12,7 +12,7 @@ import JavaScriptCore
     func scrypt(_ password: NSString, _ salt: NSString, _ N: NSNumber, _ r: NSNumber, _ p: NSNumber, _ keySize: Int) -> NSString?
 }
 
-class Crypto: NSObject, CryptoJSExport {
+class CryptoJs: NSObject, CryptoJSExport {
     
     func cryptoSecureRandomBytes(_ len: Int) -> NSString? {
         let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: len)

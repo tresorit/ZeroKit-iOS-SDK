@@ -26,11 +26,11 @@ class ZeroKitTestCaseBase: XCTestCase {
         let configFile = Bundle.main.url(forResource: "Config", withExtension: "plist")!
         let configDict = NSDictionary(contentsOf: configFile)!
         
-        let apiUrl = URL(string: configDict["ZeroKitAPIBaseURL"] as! String)!
+        let serviceUrl = URL(string: configDict["ZeroKitServiceURL"] as! String)!
         let clientId = configDict["ZeroKitClientId"] as! String
         let backendUrl = URL(string: configDict["ZeroKitAppBackend"] as! String)!
         
-        let config = ZeroKitConfig(apiBaseUrl: apiUrl)
+        let config = ZeroKitConfig(serviceUrl: serviceUrl)
         let zeroKit = ZeroKit(config: config)
         
         let backend = Backend(withBackendBaseUrl: backendUrl, authorizationCallback: { credentialsCallback in

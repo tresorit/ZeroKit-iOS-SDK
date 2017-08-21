@@ -263,6 +263,10 @@ var NativeSRP = {
         }
         
         return ios_hexToUint8Array(result)
+    },
+
+    releaseClient(client) {
+        iosSrp.releaseClient(client)
     }
 }
 

@@ -4,6 +4,7 @@ import JavaScriptCore
     func getItem(_ key: String) -> Any
     func setItem(_ key: String, _ value: String)
     func removeItem(_ key: String)
+    func keys() -> [String]
 }
 
 @objc protocol PersistenceKeysJSExport: JSExport {
@@ -55,6 +56,14 @@ class MapStorage: NSObject, StorageJSExport {
         zk_synchronized {
             self.map.removeValue(forKey: key)
         }
+    }
+    
+    func keys() -> [String] {
+        var retVal: [String]!
+        zk_synchronized {
+            retVal = Array(self.map.keys)
+        }
+        return retVal
     }
 }
 
