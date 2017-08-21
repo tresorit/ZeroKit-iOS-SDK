@@ -76,6 +76,7 @@ public class ZeroKitConfig: NSObject, NSCopying {
     
     public func copy(with zone: NSZone? = nil) -> Any {
         let copy = ZeroKitConfig(serviceUrl: self.serviceUrl, isTesting: self.isTesting, isFormatTesting: self.isFormatTesting)
+        copy.concurrentQueryLimit = self.concurrentQueryLimit
         copy.keychainAccessGroup = self.keychainAccessGroup
         copy.keychainAccessibility = self.keychainAccessibility
         return copy
