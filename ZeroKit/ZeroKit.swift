@@ -1,4 +1,4 @@
-import WebKit
+import JavaScriptCore
 
 /**
  The ZeroKit class provides the interface to the ZeroKit SDK on iOS.
@@ -11,6 +11,7 @@ public class ZeroKit: NSObject {
     fileprivate let internalApi: InternalApi
     fileprivate var idpQuery: IdentityProvider?
     fileprivate var nextIdpCalls = [(/*isCancelled: */Bool) -> Void]()
+    fileprivate var randomProvider: RandomProvider = SecRandomProvider()
     
     /**
      Initialize ZeroKit with the configuration.
@@ -43,8 +44,8 @@ public class ZeroKit: NSObject {
     }
 }
 
-fileprivate extension ZeroKit {
-    static let serviceName = "com.zerokit.rememberme"
+extension ZeroKit {
+    private static let serviceName = "com.zerokit.rememberme"
     
     func save(rememberMeKey: String, forUserId userId: String) -> Bool {
         _ = deleteRememberMeKey(forUserId: userId)
@@ -211,7 +212,6 @@ public extension ZeroKit {
         }
         
         self.internalApi.callMethod("mobileCommands.register", parameters: [userId, registrationId, password]) { success, result in
-            self.internalApi.freeSrpMemory()
             if let dict = result.toObject() as? [AnyHashable: Any], let regValidationVerifier = dict["RegValidationVerifier"] as? String , success {
                 completion(regValidationVerifier, nil)
             } else {
@@ -253,7 +253,6 @@ public extension ZeroKit {
             
         } else {
             self.internalApi.callMethod("mobileCommands.login", parameters: [userId, password]) { success, result in
-                self.internalApi.freeSrpMemory()
                 if success {
                     completion(nil)
                 } else {
@@ -280,7 +279,6 @@ public extension ZeroKit {
     
     private func loginByRememberMe(with userId: String, rememberMeKey: String, completion: @escaping DefaultCompletion) {
         self.internalApi.callMethod("mobileCommands.loginByRememberMeKey", parameters: [userId, rememberMeKey]) { success, result in
-            self.internalApi.freeSrpMemory()
             if let userId = result.toString(), success {
                 _ = self.save(rememberMeKey: rememberMeKey, forUserId: userId)
                 completion(nil)
@@ -292,7 +290,6 @@ public extension ZeroKit {
     
     private func getRememberMeKey(withUserId userId: String, password: String, completion: @escaping (String?, NSError?) -> Void) {
         self.internalApi.callMethod("mobileCommands.getRememberMeKey", parameters: [userId, password]) { success, result in
-            self.internalApi.freeSrpMemory()
             if let rememberMeKey = result.toString(), success {
                 completion(rememberMeKey, nil)
             } else {
@@ -360,7 +357,6 @@ public extension ZeroKit {
         }
         
         self.internalApi.callMethod("mobileCommands.changePassword", parameters: [userId, currentPassword, newPassword]) { success, result in
-            self.internalApi.freeSrpMemory()
             if success {
                 
                 if self.canLoginByRememberMe(with: userId) {
@@ -407,12 +403,16 @@ public extension ZeroKit {
      - parameter completion: Called when encryption finishes, contains the cipher text if successful
      */
     public func encrypt(plainText: String, inTresor tresorId: String, completion: @escaping CipherTextCompletion) {
-        self.internalApi.callMethod("mobileCommands.encrypt", parameters: [tresorId, plainText]) { success, result in
-            if let cipherText = result.toString(), success {
-                completion(cipherText, nil)
-            } else {
-                completion(nil, NSError(result))
+        if let data = plainText.data(using: .utf8) {
+            encryptInner(plainData: data, inTresor: tresorId) { data, error in
+                if let cipherText = data?.base64EncodedString() {
+                    completion(cipherText, nil)
+                } else {
+                    completion(nil, NSError(error))
+                }
             }
+        } else {
+            completion(nil, NSError(ZeroKitError.badInput))
         }
     }
     
@@ -425,12 +425,16 @@ public extension ZeroKit {
      - parameter completion: Called when decryption finishes, contains the plain text if successful
      */
     public func decrypt(cipherText: String, completion: @escaping PlainTextCompletion) {
-        self.internalApi.callMethod("mobileCommands.decrypt", parameters: [cipherText]) { success, result in
-            if let plainText = result.toString(), success {
-                completion(plainText, nil)
-            } else {
-                completion(nil, NSError(result))
+        if let data = Data(base64Encoded: cipherText) {
+            decryptInner(cipherData: data) { data, error in
+                if let data = data, let str = String(data: data, encoding: .utf8) {
+                    completion(str, nil)
+                } else {
+                    completion(nil, NSError(error))
+                }
             }
+        } else {
+            completion(nil, NSError(ZeroKitError.badInput))
         }
     }
     
@@ -442,29 +446,7 @@ public extension ZeroKit {
      - parameter completion: Called when encryption finishes, contains the cipher data if successful
      */
     public func encrypt(plainData: Data, inTresor tresorId: String, completion: @escaping CipherDataCompletion) {
-        backgroundQueue.async {
-            
-            let plainDataBase64 = plainData.base64EncodedString()
-            
-            self.internalApi.callMethod("ios_cmd_api_encryptBytes", parameters: [tresorId, plainDataBase64]) { success, result in
-                
-                self.backgroundQueue.async {
-                    
-                    if let cipherDataBase64 = result.toString(),
-                        let cipherData = Data(base64Encoded: cipherDataBase64),
-                        success {
-                        
-                        DispatchQueue.main.async {
-                            completion(cipherData, nil)
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            completion(nil, NSError(result))
-                        }
-                    }
-                }
-            }
-        }
+        encryptInner(plainData: plainData, inTresor: tresorId, completion: completion)
     }
     
     /**
@@ -474,30 +456,72 @@ public extension ZeroKit {
      - parameter completion: Called when decryption finishes, contains the plain data if successful
      */
     public func decrypt(cipherData: Data, completion: @escaping PlainDataCompletion) {
-        backgroundQueue.async {
-            
-            let cipherDataBase64 = cipherData.base64EncodedString()
-            
-            self.internalApi.callMethod("ios_cmd_api_decryptBytes", parameters: [cipherDataBase64]) { success, result in
+        decryptInner(cipherData: cipherData, completion: completion)
+    }
+    
+    private func encryptInner(plainData: Data, inTresor tresorId: String, completion: @escaping CipherDataCompletion) {
+        self.internalApi.callMethod("internalMobileCommands.getEncryptionKeyData", parameters: [tresorId]) { success, result in
+            if let dict = result.toDictionary(),
+                let keyDict = dict["key"] as? [String: NSNumber],
+                let keyVersion = dict["keyVersion"] as? NSNumber,
+                success {
                 
-                self.backgroundQueue.async {
-                    
-                    if let plainDataBase64 = result.toString(),
-                        let plainData = Data(base64Encoded: plainDataBase64),
-                        success {
-                        
-                        DispatchQueue.main.async {
-                            completion(plainData, nil)
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            completion(nil, NSError(result))
+                let data = PlainData(data: plainData, randomProvider: self.randomProvider)
+                var key = Data(count: keyDict.count)
+                
+                do {
+                    try key.withUnsafeMutableBytes { (ptr: UnsafeMutablePointer<UInt8>) -> Void in
+                        for i in 0 ..< keyDict.count {
+                            if let byte = keyDict["\(i)"]?.uint8Value {
+                                ptr[i] = byte
+                            } else {
+                                throw NSError(ZeroKitError.dataFormatError)
+                            }
                         }
                     }
+                    
+                    let cipherData = try data.cipherBytes(tresorId: tresorId, key: key, keyVersion: keyVersion.uintValue)
+                    completion(cipherData, nil)
+                    
+                } catch {
+                    completion(nil, NSError(error))
+                    return
                 }
+                
+            } else {
+                completion(nil, NSError(result))
             }
         }
     }
+    
+    private func decryptInner(cipherData: Data, completion: @escaping PlainDataCompletion) {
+        let data: CipherData
+        do {
+            data = try CipherData(cipherData: cipherData)
+        } catch {
+            completion(nil, NSError(error))
+            return
+        }
+        
+        self.internalApi.callMethod("internalMobileCommands.getDecryptionKey", parameters: [data.tresorId, data.keyVersion]) { success, result in
+            if let byteArray = result.toArray() as? [NSNumber], success {
+                var keyData = Data(count: byteArray.count)
+                keyData.withUnsafeMutableBytes { (ptr: UnsafeMutablePointer<UInt8>) -> Void in
+                    for (i, byte) in byteArray.enumerated() {
+                        ptr[i] = byte.uint8Value
+                    }
+                }
+                if let plainData = data.plainBytes(key: keyData) {
+                    completion(plainData, nil)
+                } else {
+                    completion(nil, NSError(ZeroKitError.unknownError))
+                }
+            } else {
+                completion(nil, NSError(result))
+            }
+        }
+    }
+    
     
     /**
      Creates a tresor bound to the user but it will only be usable once it's approved. The tresor ID returned in the completion callback should be saved as it is the only way to identifiy the tresor.
@@ -643,6 +667,23 @@ public extension ZeroKit {
     }
     
     /**
+     Revoke an existing invitation link to a tresor.
+     
+     - parameter tresorId: The id of the tresor
+     - parameter secret: The secret is in the fragment identifier of the link url
+     - parameter completion: Called when the operation finished.
+     */
+    public func revokeInvitationLink(forTresor tresorId: String, secret: String, completion: @escaping OperationIdCompletion) {
+        self.internalApi.callMethod("mobileCommands.revokeInvitationLink", parameters: [tresorId, secret]) { success, result in
+            if let opId = result.toString(), success {
+                completion(opId, nil)
+            } else {
+                completion(nil, NSError(result))
+            }
+        }
+    }
+    
+    /**
      Retrieves information about the link.
      
      - parameter secret: The secret is in the fragment identifier of the link url
@@ -698,7 +739,8 @@ public extension ZeroKit {
         
         self.idpQuery = IdentityProvider(clientId: clientId,
                                          internalApi: self.internalApi,
-                                         webviewHostView: webViewHostView!)
+                                         webviewHostView: webViewHostView!,
+                                         randomProvider: self.randomProvider)
         
         self.idpQuery!.getIdentityTokens(useProofKey: useProofKey) { [weak self] (identityTokens, error) in
             completion(identityTokens, error)
@@ -720,5 +762,49 @@ public extension ZeroKit {
             next(true)
         }
         self.idpQuery?.cancelRequest()
+    }
+}
+
+// MARK: (Format) Testing Support
+extension ZeroKit {
+    func call(methodOnObject: String, parameters: [Any], completion: @escaping InternalApi.JsApiResultCallback) {
+        internalApi.callMethod(methodOnObject, parameters: parameters, callback: completion)
+    }
+    
+    func json(from link: InvitationLink) -> Any {
+        return ["id": link.id,
+                "url": link.url.absoluteString]
+    }
+    
+    func json(from info: InvitationLinkPublicInfo, completion: @escaping (Any?, NSError?) -> Void) {
+        internalApi.callMethod("ios_safeLinkTokenForId", parameters: [info.token]) { success, result in
+            if let tokenDict = result.toDictionary(), success {
+                
+                var json = [String: Any]()
+                json["$token"] = tokenDict
+                json["isPasswordProtected"] = info.isPasswordProtected
+                json["message"] = info.message
+                json["creatorUserId"] = info.creatorUserId
+                
+                completion(json, nil)
+                
+            } else {
+                completion(nil, NSError(result))
+            }
+        }
+    }
+    
+    func tokenId(from token: [String: Any], completion: @escaping (String?, NSError?) -> Void) {
+        internalApi.callMethod("ios_placeSafeLinkToken", parameters: [token]) { success, result in
+            if let tokenId = result.toString(), success {
+                completion(tokenId, nil)
+            } else {
+                completion(nil, NSError(result))
+            }
+        }
+    }
+    
+    func setJsRandomProvider() {
+        randomProvider = internalApi.jsRandomProvider()
     }
 }

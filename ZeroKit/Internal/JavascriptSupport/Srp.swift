@@ -7,6 +7,7 @@ import JavaScriptCore
     func calculateClientEvidence(_ client: SrpClient) -> NSString?
     func verifyServerEvidenceMessage(_ client: SrpClient, _ serverProof: NSString) -> Bool
     func calculateVerifier(_ client: SrpClient, _ x: NSString) -> NSString?
+    func releaseClient(_ client: SrpClient)
 }
 
 class Srp: NSObject, SrpJSExport {
@@ -14,15 +15,8 @@ class Srp: NSObject, SrpJSExport {
     private var clients = [SrpClient]()
     
     deinit {
-        cleanUpClients()
-    }
-    
-    func cleanUpClients() {
-        zk_synchronized {
-            for client in clients {
-                client.free()
-            }
-            clients.removeAll()
+        for client in clients {
+            client.free()
         }
     }
     
@@ -70,6 +64,10 @@ class Srp: NSObject, SrpJSExport {
         }
         return nil
     }
+    
+    func releaseClient(_ client: SrpClient) {
+        client.free()
+    }
 }
 
 class SrpClient: NSObject {
@@ -83,7 +81,7 @@ class SrpClient: NSObject {
         }
     }
     
-    func free() {
+    fileprivate func free() {
         if let ptr = clientPtr {
             clientPtr = nil
             srp6ClientFree(ptr)

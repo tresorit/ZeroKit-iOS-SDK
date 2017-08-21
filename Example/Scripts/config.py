@@ -21,7 +21,7 @@ def prepareSource(baseUrl, clientId, appBackendUrl):
 		with open(filepath, 'r') as file :
 			filedata = file.read()
 
-		filedata = filedata.replace('{TenantBaseUrl}', baseUrl)
+		filedata = filedata.replace('{ServiceUrl}', baseUrl)
 		filedata = filedata.replace('{ClientId}', clientId)
 		filedata = filedata.replace('{AppBackendUrl}', appBackendUrl)
 
@@ -32,7 +32,7 @@ def prepareSource(baseUrl, clientId, appBackendUrl):
 
 def argParser():
 	parser = argparse.ArgumentParser(description='Configure ZeroKit example app')
-	parser.add_argument('-b', '--baseurl', help='Your API base URL.', required=True)
+	parser.add_argument('-b', '--baseurl', help='Your service URL.', required=True)
 	parser.add_argument('-c', '--clientid', help='Your mobile app client ID.', required=True)
 	parser.add_argument('-a', '--appbackendurl', help='Your application backend URL.', required=True)
 	return parser
