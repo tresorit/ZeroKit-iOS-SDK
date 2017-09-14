@@ -1,9 +1,11 @@
 language: objective-c
 osx_image: xcode8.1
+before_install:
+- gem install xcpretty -N
 script:
 - python Example/Scripts/config.py -b $BASE_URL_V3 -c $CLIENT_ID_V3 -a $APP_BACKEND_URL_V3
 - xcodebuild -version
 - xcodebuild -showsdks
-- xcodebuild build -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7"
-- xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7,OS=10.1"
-- xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 6s,OS=9.3"
+- set -o pipefail && env NSUnbufferedIO=YES xcodebuild build -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7" | xcpretty
+- set -o pipefail && env NSUnbufferedIO=YES xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 7,OS=10.1" | xcpretty
+- set -o pipefail && env NSUnbufferedIO=YES xcodebuild test  -workspace "ZeroKit.xcworkspace" -scheme "ZeroKitExample" -sdk iphonesimulator -configuration Debug -derivedDataPath out/DerivedData -destination "platform=iOS Simulator,name=iPhone 6s,OS=9.3" | xcpretty

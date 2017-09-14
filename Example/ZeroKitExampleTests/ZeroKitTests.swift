@@ -84,6 +84,30 @@ class ZeroKitTests: ZeroKitTestCaseBase {
         logout()
     }
     
+    func testMultiTresorCreation() {
+        let user = registerUser()
+        loginUser(user)
+        
+        var j = 0
+        for i in 0 ..< 100 {
+            let expectation = self.expectation(description: "Create tresor \(i)")
+            
+            zeroKitStack.zeroKit.createTresor { tresorId, error in
+                defer {
+                    j += 1
+                    expectation.fulfill()
+                }
+                guard error == nil else {
+                    XCTFail("[\(j)] Tresor creation \(i) failed: \(error!).")
+                    return
+                }
+                print("[\(j)] Tresor \(i) \(tresorId!) created.")
+            }
+        }
+        
+        waitForExpectations(timeout: 5*60, handler: nil)
+    }
+    
     func testTextEncryption() {
         let user = registerUser()
         loginUser(user)

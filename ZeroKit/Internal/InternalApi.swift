@@ -296,13 +296,22 @@ class InternalApi: NSObject {
     
     private func setBaseUrl(completion: @escaping ErrorCallback) {
         queue.async {
-            let function = self.context.evaluateScript("mobileCommands.setBaseURL")!
-            let result = function.call(withArguments: [self.config.serviceUrl.absoluteString])
+            var error: NSError?
             
-            Log.v("Set base url: %@", result?.toObject() as? CVarArg ?? "Unexpected value")
+            let function = self.context.evaluateScript("mobileCommands.setBaseURL")!
+            
+            if function.isUndefined || function.isNull {
+                error = NSError(nil, message: "Function not found")
+                Log.e("Cannot set base URL. Function not found.")
+            } else if let result = function.call(withArguments: [self.config.serviceUrl.absoluteString]) {
+                Log.v("Set base url: %@", result.toObject() as? CVarArg ?? "Unexpected value")
+            } else {
+                error = NSError(nil, message: "Not a function")
+                Log.e("Cannot set base URL. Not a function.")
+            }
             
             DispatchQueue.main.async {
-                completion(nil)
+                completion(error)
             }
         }
     }

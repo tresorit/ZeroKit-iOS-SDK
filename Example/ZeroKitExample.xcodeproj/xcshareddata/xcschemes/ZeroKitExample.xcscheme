@@ -54,6 +54,9 @@
                   Identifier = "ZeroKitExampleTests/testRememberMe()">
                </Test>
                <Test
+                  Identifier = "ZeroKitTests/testMultiTresorCreation()">
+               </Test>
+               <Test
                   Identifier = "ZeroKitTests/testPasswordChangeRememberMe()">
                </Test>
                <Test
