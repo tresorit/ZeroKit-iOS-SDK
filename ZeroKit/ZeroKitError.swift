@@ -217,14 +217,14 @@ extension NSError {
     convenience init(_ result: Any?, defaultErrorCode: ZeroKitError = .unknownError, message: String? = nil, line: Int = #line, file: String = #file) {
         var code = defaultErrorCode
         let domain = (ZeroKitError.unknownError as NSError).domain
-        var info = [AnyHashable: Any]()
+        var info = [String: Any]()
         var description: String?
         
         func handle(error: NSError) {
             if let zkError = error as? ZeroKitError {
                 code = zkError
             }
-            info[NSUnderlyingErrorKey] = error as NSError
+            info[NSUnderlyingErrorKey] = error
         }
         
         if let error = result as? NSError {
