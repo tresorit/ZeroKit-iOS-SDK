@@ -216,13 +216,16 @@ public func ==<T: Error>(lhs: T, rhs: ZeroKitError) -> Bool {
 extension NSError {
     convenience init(_ result: Any?, defaultErrorCode: ZeroKitError = .unknownError, message: String? = nil, line: Int = #line, file: String = #file) {
         var code = defaultErrorCode
-        let domain = (ZeroKitError.unknownError as NSError).domain
+        let zeroKitErrorDomain = (ZeroKitError.unknownError as NSError).domain
         var info = [String: Any]()
         var description: String?
         
         func handle(error: NSError) {
-            if let zkError = error as? ZeroKitError {
-                code = zkError
+            if error.domain == zeroKitErrorDomain {
+                /* We are checking the error domain to prevent crashes that may occur during the below optional type cast... */
+                if let zkError = error as? ZeroKitError {
+                    code = zkError
+                }
             }
             info[NSUnderlyingErrorKey] = error
         }
@@ -250,7 +253,7 @@ extension NSError {
         }
         info["ZeroKitErrorOrigin"] = String(format: "%@:%d", (file as NSString).lastPathComponent, line)
         
-        self.init(domain: domain, code: code.rawValue, userInfo: info)
+        self.init(domain: zeroKitErrorDomain, code: code.rawValue, userInfo: info)
         
         Log.v("Error created: %@", self.description)
     }
