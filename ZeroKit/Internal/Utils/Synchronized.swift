@@ -1,7 +1,7 @@
 import Foundation
 
 extension NSObjectProtocol {
-    static func zk_synchronized(_ closure: (Void) -> Void) {
+    static func zk_synchronized(_ closure: () -> Void) {
         objc_sync_enter(self)
         defer {
             objc_sync_exit(self)
@@ -9,7 +9,7 @@ extension NSObjectProtocol {
         closure()
     }
     
-    func zk_synchronized(_ closure: (Void) -> Void) {
+    func zk_synchronized(_ closure: () -> Void) {
         objc_sync_enter(self)
         defer {
             objc_sync_exit(self)
