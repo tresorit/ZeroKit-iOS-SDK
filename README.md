@@ -1,3 +1,6 @@
+**Notice:** This project is discontinued and no longer maintained nor supported by Tresorit. This repository only exists for archival purposes.
+***
+
 # ZeroKit SDK for iOS
 
 [![Build Status](https://api.travis-ci.org/tresorit/ZeroKit-iOS-SDK.svg?branch=master)](https://travis-ci.org/tresorit/ZeroKit-iOS-SDK)
